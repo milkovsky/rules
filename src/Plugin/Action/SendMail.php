@@ -7,7 +7,12 @@
 
 namespace Drupal\rules\Plugin\Action;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\rules\Engine\RulesActionBase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Send mail' action.
@@ -50,7 +55,41 @@ use Drupal\rules\Engine\RulesActionBase;
  *   unique key for the mail. Now $this->getPluginId() and $this->getBaseId() is
  *   used, but it's needs to be fixed.
  */
-class SendMail extends RulesActionBase {
+class SendMail extends RulesActionBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * @var LoggerInterface $logger
+   */
+  protected $logger;
+
+  /**
+   * Constructs a SendEmail object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param LoggerInterface $logger
+   *   The alias storage service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->logger = $logger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('logger.factory')->get('rules')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -78,7 +117,7 @@ class SendMail extends RulesActionBase {
 
     $message = drupal_mail('rules', $key, $to, $langcode, $params, $reply);
     if ($message['result']) {
-      \Drupal::logger('rules')->notice('Successfully sent email to %recipient.', array('%recipient' => $to));
+      $this->logger->log(LogLevel::NOTICE, $this->t('Successfully sent email to %recipient', array('%recipient' => $to)));
     }
   }
 }
