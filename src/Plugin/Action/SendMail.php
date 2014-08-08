@@ -16,26 +16,27 @@ use Drupal\rules\Engine\RulesActionBase;
  *   id = "rules_send_mail",
  *   label = @Translation("Send mail"),
  *   context = {
- *     "to" = @ContextDefinition("string",
+ *     "to" = @ContextDefinition("email",
  *       label = @Translation("To"),
- *       description = @Translation("The e-mail address or addresses where the message will be sent to. The formatting of this string must comply with RFC 2822.")
+ *       description = @Translation("The e-mail address or addresses where the message will be sent to. The formatting of this string must comply with RFC 2822."),
+ *       multiple = TRUE
  *     ),
  *     "subject" = @ContextDefinition("string",
  *       label = @Translation("Subject"),
- *       description = @Translation("The mail's subject."),
+ *       description = @Translation("The mail's subject.")
  *     ),
  *     "message" = @ContextDefinition("string",
  *       label = @Translation("Message"),
  *       description = @Translation("The mail's message body.")
  *     ),
- *     "from" = @ContextDefinition("string",
- *       label = @Translation("From"),
- *       description = @Translation("The mail's from address. Leave it empty to use the site-wide configured address.")
+ *     "reply" = @ContextDefinition("email",
+ *       label = @Translation("reply"),
+ *       description = @Translation("The mail's reply address. Leave it empty to use the site-wide configured address."),
  *       required = FALSE
  *     ),
  *     "language" = @ContextDefinition("language",
  *       label = @Translation("Language"),
- *       description = @Translation("If specified, the language used for getting the mail message and subject.")
+ *       description = @Translation("If specified, the language used for getting the mail message and subject."),
  *       required = FALSE
  *     )
  *   }
@@ -62,9 +63,8 @@ class SendMail extends RulesActionBase {
    * {@inheritdoc}
    */
   public function execute() {
-    $to = str_replace(array("\r", "\n"), '', $this->getContextValue('to'));
-    $from = $this->getContextValue('from');
-    $from = !empty($from) ? str_replace(array("\r", "\n"), '', $from) : NULL;
+    $to = implode(',', $this->getContextValue('to'));
+    $reply = $this->getContextValue('reply');
     $language = $this->getContextValue('language');
     $langcode = isset($language) ? $language->getId() : LanguageInterface::LANGCODE_NOT_SPECIFIED;
     $params = array(
@@ -76,7 +76,7 @@ class SendMail extends RulesActionBase {
     $name = $this->getBaseId() ? $this->getBaseId() : 'unnamed';
     $key = 'rules_action_mail_' . $name . '_' . $this->getPluginId();
 
-    $message = drupal_mail('rules', $key, $to, $langcode, $params, $from);
+    $message = drupal_mail('rules', $key, $to, $langcode, $params, $reply);
     if ($message['result']) {
       \Drupal::logger('rules')->notice('Successfully sent email to %recipient.', array('%recipient' => $to));
     }
