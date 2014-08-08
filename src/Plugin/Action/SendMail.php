@@ -9,9 +9,9 @@ namespace Drupal\rules\Plugin\Action;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\rules\Engine\RulesActionBase;
+use Drupal\Core\Mail\MailManager;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,6 +63,11 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
   protected $logger;
 
   /**
+   * @var MailManager $mailManager
+   */
+  protected $mailManager;
+
+  /**
    * Constructs a SendEmail object.
    *
    * @param array $configuration
@@ -74,9 +79,10 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
    * @param LoggerInterface $logger
    *   The alias storage service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger, MailManager $mailManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->logger = $logger;
+    $this->mailManager = $mailManager;
   }
 
   /**
@@ -87,7 +93,8 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('logger.factory')->get('rules')
+      $container->get('logger.factory')->get('rules'),
+      $container->get('plugin.manager.mail')
     );
   }
 
@@ -115,7 +122,7 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
     $name = $this->getBaseId() ? $this->getBaseId() : 'unnamed';
     $key = 'rules_action_mail_' . $name . '_' . $this->getPluginId();
 
-    $message = drupal_mail('rules', $key, $to, $langcode, $params, $reply);
+    $message = $this->mailManager->mail('rules', $key, $to, $langcode, $params, $reply);
     if ($message['result']) {
       $this->logger->log(LogLevel::NOTICE, $this->t('Successfully sent email to %recipient', array('%recipient' => $to)));
     }
