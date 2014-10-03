@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a 'Send mail' action.
  *
  * @Action(
- *   id = "rules_send_mail",
+ *   id = "rules_mail_send",
  *   label = @Translation("Send mail"),
  *   context = {
  *     "to" = @ContextDefinition("email",
@@ -49,13 +49,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @todo: Add access callback information from Drupal 7.
  * @todo: Add group information from Drupal 7.
+ * @todo: Long text for message.
  * @todo: Language context has "options list", "default value" and "default
  *   mode" settings in Drupal 7.
  * @todo Get RulesPlugin $element variable in execute function to generate
  *   unique key for the mail. Now $this->getPluginId() and $this->getBaseId() is
  *   used, but it's needs to be fixed.
  */
-class SendMail extends RulesActionBase implements ContainerFactoryPluginInterface {
+class SystemMailSend extends RulesActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * @var LoggerInterface $logger
@@ -68,7 +69,7 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
   protected $mailManager;
 
   /**
-   * Constructs a SendEmail object.
+   * Constructs a SystemMailSend object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -78,6 +79,8 @@ class SendMail extends RulesActionBase implements ContainerFactoryPluginInterfac
    *   The plugin implementation definition.
    * @param LoggerInterface $logger
    *   The alias storage service.
+   * @param MailManager $mailManager
+   *   The mail manager service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger, MailManager $mailManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
