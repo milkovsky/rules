@@ -55,4 +55,8 @@ class SystemSetBreadcrumb extends RulesActionBase {
   public function summary() {
     return $this->t("Set the site's breadcrumb.");
   }
+
+  public function execute() {
+
+  }
 }
