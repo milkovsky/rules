@@ -15,6 +15,7 @@ use Drupal\rules\Engine\RulesActionBase;
  * @action(
  *   id = "rules_user_role_add",
  *   label = @Translation("Adds roles to a particular user"),
+ *   category = @Translation("User"),
  *   context = {
  *     "user" = @ContextDefinition("entity:user",
  *       label = @Translation("User")
@@ -27,7 +28,7 @@ use Drupal\rules\Engine\RulesActionBase;
  * )
  *
  * @todo: Add access callback information from Drupal 7.
- * @todo: Add group information from Drupal 7.
+ * @todo: Add port for rules_user_roles_options_list.
  */
 class UserRoleAdd extends RulesActionBase {
 
@@ -44,6 +45,9 @@ class UserRoleAdd extends RulesActionBase {
   public function execute() {
     $account = $this->getContextValue('user');
     $roles = $this->getContextValue('roles');
+
+    //@todo: Deal with the anonymous role.
+    //@todo: Implement auto-save functionality.
 
     if ($account !== FALSE) {
       foreach ($roles as $role) {
