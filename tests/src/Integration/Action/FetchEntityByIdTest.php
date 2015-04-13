@@ -83,7 +83,7 @@ class FetchEntityByIdTest extends RulesEntityIntegrationTestBase {
       ->will($this->returnValue($entityStorage));
 
     $this->action
-      ->setContextValue('entity_type', 'test')
+      ->setContextValue('entity_type_id', 'test')
       ->setContextValue('entity_id', 1)
       ->execute();
 
