@@ -55,10 +55,10 @@ class DataCalculateValue extends RulesActionBase {
    */
   public function execute() {
     $input_1 = $this->getContextValue('input_1');
-    $op = $this->getContextValue('operator');
+    $operator = $this->getContextValue('operator');
     $input_2 = $this->getContextValue('input_2');
 
-    switch ($op) {
+    switch ($operator) {
       case '+':
         $result = $input_1 + $input_2;
         break;
