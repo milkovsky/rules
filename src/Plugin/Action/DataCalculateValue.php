@@ -39,7 +39,7 @@ use Drupal\rules\Core\RulesActionBase;
  *
  * @todo: Add access callback information from Drupal 7.
  * @todo: Add defined operation options from Drupal 7.
- * @todo: If context args are integers we must ensure that integers are returned.
+ * @todo: If context args are integers, ensure that integers are returned.
  */
 class DataCalculateValue extends RulesActionBase {
 

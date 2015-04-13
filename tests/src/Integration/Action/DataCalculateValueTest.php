@@ -27,7 +27,6 @@ class DataCalculateValueTest extends RulesIntegrationTestBase {
    */
   public function setUp() {
     parent::setUp();
-
     $this->action = $this->actionManager->createInstance('rules_data_calculate_value');
   }
 
