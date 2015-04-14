@@ -19,12 +19,7 @@ trait RulesUserIntegrationTestTrait {
    *   The mocked user.
    */
   protected function getMockUser() {
-    $account = $this
-      ->getMockBuilder('Drupal\user\Entity\User')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    return $account;
+    return $this->getMock('Drupal\user\UserInterface');
   }
 
   /**
@@ -37,9 +32,7 @@ trait RulesUserIntegrationTestTrait {
    *   The mocked role.
    */
   protected function getMockUserRole($name) {
-    $role = $this->getMockBuilder('Drupal\user\Entity\Role')
-      ->disableOriginalConstructor()
-      ->setMethods(['id'])
+    $role = $this->getMockBuilder('Drupal\user\RoleInterface')
       ->getMock();
 
     $role->expects($this->any())
