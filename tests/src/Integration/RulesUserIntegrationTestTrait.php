@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\Tests\rules\Integration\RulesUserIntegrationTestTrait.
+ */
+
+namespace Drupal\Tests\rules\Integration;
+
+/**
+ * Base class for Rules integration tests with user entities.
+ */
+trait RulesUserIntegrationTestTrait {
+
+  /**
+   * Creates a mocked user.
+   *
+   * @return \Drupal\user\UserInterface|\PHPUnit_Framework_MockObject_MockObject
+   *   The mocked user.
+   */
+  protected function getMockUser() {
+    $account = $this
+      ->getMockBuilder('Drupal\user\Entity\User')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    return $account;
+  }
+
+  /**
+   * Creates a mocked user role.
+   *
+   * @param string $name
+   *   The machine-readable name of the mocked role.
+   *
+   * @return \Drupal\user\RoleInterface|\PHPUnit_Framework_MockObject_MockBuilder
+   *   The mocked role.
+   */
+  protected function getMockUserRole($name) {
+    $role = $this->getMockBuilder('Drupal\user\Entity\Role')
+      ->disableOriginalConstructor()
+      ->setMethods(['id'])
+      ->getMock();
+
+    $role->expects($this->any())
+      ->method('id')
+      ->will($this->returnValue($name));
+
+    return $role;
+  }
+
+}

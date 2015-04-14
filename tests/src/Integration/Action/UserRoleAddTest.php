@@ -8,6 +8,7 @@
 namespace Drupal\Tests\rules\Integration\Action;
 
 use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
+use Drupal\Tests\rules\Integration\RulesUserIntegrationTestTrait;
 
 /**
  * @coversDefaultClass \Drupal\rules\Plugin\Action\UserRoleAdd
@@ -15,10 +16,12 @@ use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
  */
 class UserRoleAddTest extends RulesEntityIntegrationTestBase {
 
+  use RulesUserIntegrationTestTrait;
+
   /**
    * The action that is being tested.
    *
-   * @var \Drupal\rules\Engine\RulesActionInterface
+   * @var \Drupal\rules\Core\RulesActionInterface
    */
   protected $action;
 
@@ -26,10 +29,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $this->enableModule('user');
-
     parent::setUp();
-
+    $this->enableModule('user');
     $this->action = $this->actionManager->createInstance('rules_user_role_add');
   }
 
@@ -43,82 +44,122 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   }
 
   /**
-   * Tests evaluating the action.
+   * Tests adding of one role to user.
    *
    * @covers ::execute()
    */
-  public function testActionExecution() {
-    // Set-up a mock object with roles 'authenticated' and 'editor', but not
-    // 'administrator'.
-    $account = $this->getMock('Drupal\user\UserInterface');
-    $account->expects($this->exactly(7))
-      ->method('getRoles')
-      ->will($this->returnValue(['authenticated', 'editor']));
+  public function testAddOneRole() {
+    // Set-up a mock user.
+    $account = $this->getMockUser();
+    $account->expects($this->once())
+      ->method('addRole');
+    $account->expects($this->once())
+      ->method('save');
 
-    $authenticated = $this->getMockRole('authenticated');
-    $editor = $this->getMockRole('editor');
-    $administrator = $this->getMockRole('administrator');
+    // Mock the 'administrator' user role.
+    $administrator = $this->getMockUserRole('administrator');
 
-    // First test adding one role.
+    // Test adding of one role.
     $this->action
-      ->setContextValue('user', $this->getMockTypedData($account))
-      ->setContextValue('roles', $this->getMockTypedData([$administrator]));
-
-    $this->action->execute();
-
-    $this->assertTrue(array_search($administrator->rid, $account->getRoles()), 'The role ' . $administrator->rid . ' is present in the user object.');
-
-/*
-    // User doesn't have the administrator role, this should fail.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$authenticated, $administrator]));
-    $this->assertFalse($this->action->evaluate());
-
-    // Only one role, should succeed.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$authenticated]));
-    $this->assertTrue($this->action->evaluate());
-
-    // A role the user doesn't have.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$administrator]));
-    $this->assertFalse($this->action->evaluate());
-
-    // Only one role, the user has with OR action, should succeed.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$authenticated]));
-    $this->action->setContextValue('operation', $this->getMockTypedData('OR'));
-    $this->assertTrue($this->action->evaluate());
-
-    // User doesn't have the administrator role, but has the authenticated,
-    // should succeed.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$authenticated, $administrator]));
-    $this->action->setContextValue('operation', $this->getMockTypedData('OR'));
-    $this->assertTrue($this->action->evaluate());
-
-    // User doesn't have the administrator role. This should fail.
-    $this->action->setContextValue('roles', $this->getMockTypedData([$administrator]));
-    $this->action->setContextValue('operation', $this->getMockTypedData('OR'));
-    $this->assertFalse($this->action->evaluate());
-*/
+      ->setContextValue('user', $account)
+      ->setContextValue('roles', [$administrator])
+      ->execute();
   }
 
   /**
-   * Creates a mocked user role.
+   * Tests adding of three roles to user.
    *
-   * @param string $id
-   *   The machine-readable name of the mocked role.
-   *
-   * @return \PHPUnit_Framework_MockObject_MockBuilder|\Drupal\user\RoleInterface
-   *   The mocked role.
+   * @covers ::execute()
    */
-  protected function getMockRole($id) {
-    $role = $this->getMockBuilder('Drupal\user\Entity\Role')
-      ->disableOriginalConstructor()
-      ->setMethods(['id'])
-      ->getMock();
+  public function testAddThreeRoles() {
+    // Set-up a mock user.
+    $account = $this->getMockUser();
+    $account->expects($this->exactly(3))
+      ->method('addRole');
+    $account->expects($this->once())
+      ->method('save');
 
-    $role->expects($this->any())
-      ->method('id')
-      ->will($this->returnValue($id));
+    // Mock user roles.
+    $manager = $this->getMockUserRole('manager');
+    $editor = $this->getMockUserRole('editor');
+    $administrator = $this->getMockUserRole('administrator');
 
-    return $role;
+    // Test adding of three roles role.
+    $this->action
+      ->setContextValue('user', $account)
+      ->setContextValue('roles', [$manager, $editor, $administrator])
+      ->execute();
+  }
+
+  /**
+   * Tests adding of existing role to user.
+   *
+   * @covers ::execute()
+   */
+  public function testAddExistingRole() {
+    // Set-up a mock user with role 'administrator'.
+    $account = $this->getMockUser();
+    $account->expects($this->once())
+      ->method('hasRole')
+      ->with($this->equalTo('administrator'))
+      ->will($this->returnValue(TRUE));
+
+    // We do not expect call of 'save' and 'addRole' methods.
+    $account->expects($this->never())
+      ->method('addRole');
+    $account->expects($this->never())
+      ->method('save');
+
+    // Mock the 'administrator' user role.
+    $administrator = $this->getMockUserRole('administrator');
+
+    // Test adding one role.
+    $this->action
+      ->setContextValue('user', $account)
+      ->setContextValue('roles', [$administrator])
+      ->execute();
+  }
+
+  /**
+   * Tests adding of one existing and one nonexistent role to user.
+   *
+   * @covers ::execute()
+   */
+  public function testAddExistingAndNonexistentRole() {
+    // Set-up a mock user with role 'administrator' but without 'editor'.
+    $account = $this->getMockUser();
+    $account->expects($this->exactly(2))
+      ->method('hasRole')
+      ->with($this->logicalOr(
+        $this->equalTo('editor'),
+        $this->equalTo('administrator')
+      ))
+      ->will($this->returnCallback(
+        function($id) {
+          if ($id == 'administrator') {
+            return TRUE;
+          }
+          else {
+            return FALSE;
+          }
+        }
+      ));
+
+    // We expect only one call of 'save' and 'addRole' methods.
+    $account->expects($this->once())
+      ->method('addRole');
+    $account->expects($this->once())
+      ->method('save');
+
+    // Mock user roles.
+    $editor = $this->getMockUserRole('editor');
+    $administrator = $this->getMockUserRole('administrator');
+
+    // Test adding one role.
+    $this->action
+      ->setContextValue('user', $account)
+      ->setContextValue('roles', [$administrator, $editor])
+      ->execute();
   }
 
 }

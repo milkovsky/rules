@@ -20,7 +20,7 @@ use Drupal\rules\Core\RulesActionBase;
  *     "user" = @ContextDefinition("entity:user",
  *       label = @Translation("User")
  *     ),
- *     "roles" = @ContextDefinition("entity:role",
+ *     "roles" = @ContextDefinition("entity:user_role",
  *       label = @Translation("Entity"),
  *       multiple = TRUE
  *     )
@@ -46,19 +46,25 @@ class UserRoleAdd extends RulesActionBase {
     $account = $this->getContextValue('user');
     $roles = $this->getContextValue('roles');
 
-    //@todo: Deal with the anonymous role.
-    //@todo: Implement auto-save functionality.
+    //@todo: Deal with the anonymous role. Invalid argument exception.
+    //@todo: Implement auto-save functionality. Let rules to deal with user save.
 
     if ($account !== FALSE) {
+      // Indicates if the user account was changed.
+      $user_is_changed = FALSE;
       foreach ($roles as $role) {
         // Skip adding the role to the user if they already have it.
-        if (!$account->hasRole($role->rid)) {
+        if (!$account->hasRole($role->id())) {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
-          $account->addRole($role->rid);
-          $account->save();
+          $account->addRole($role->id());
+          $user_is_changed = TRUE;
         }
+      }
+      // Save user only in case of change.
+      if ($user_is_changed) {
+        $account->save();
       }
     }
   }
