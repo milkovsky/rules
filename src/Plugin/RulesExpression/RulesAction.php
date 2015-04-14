@@ -10,6 +10,7 @@ namespace Drupal\rules\Plugin\RulesExpression;
 use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\rules\Context\ContextHandlerTrait;
 use Drupal\rules\Core\RulesActionBase;
 use Drupal\rules\Engine\ActionExpressionInterface;
 use Drupal\rules\Engine\RulesExpressionTrait;
@@ -31,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RulesAction extends RulesActionBase implements ContainerFactoryPluginInterface, ActionExpressionInterface {
 
   use RulesExpressionTrait;
+  use ContextHandlerTrait;
 
   /**
    * The action manager used to instantiate the action plugin.
@@ -104,12 +106,7 @@ class RulesAction extends RulesActionBase implements ContainerFactoryPluginInter
     $auto_saves = $action->autoSaveContext();
     foreach ($auto_saves as $context_name) {
       // Mark parameter contexts for auto saving in the Rules state.
-      if (isset($this->configuration['context_mapping'][$context_name . ':select'])) {
-        $state->saveChangesLater($this->configuration['context_mapping'][$context_name . ':select']);
-      }
-      else {
-        $state->saveChangesLater($context_name);
-      }
+      $state->saveChangesLater($this->configuration['context_mapping'][$context_name]);
     }
 
     // Now that the action has been executed it can provide additional
