@@ -53,7 +53,12 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
     // Set-up a mock user.
     $account = $this->getMockUser();
     $account->expects($this->once())
-      ->method('addRole');
+      ->method('hasRole')
+      ->with($this->equalTo('administrator'))
+      ->will($this->returnValue(FALSE));
+    $account->expects($this->once())
+      ->method('addRole')
+      ->with($this->equalTo('administrator'));
     $account->expects($this->once())
       ->method('save');
 
@@ -75,8 +80,24 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   public function testAddThreeRoles() {
     // Set-up a mock user.
     $account = $this->getMockUser();
+    // Mock hasRole.
     $account->expects($this->exactly(3))
-      ->method('addRole');
+      ->method('hasRole')
+      ->with($this->logicalOr(
+        $this->equalTo('manager'),
+        $this->equalTo('editor'),
+        $this->equalTo('administrator')
+      ))
+      ->will($this->returnValue(FALSE));
+    // Mock addRole.
+    $account->expects($this->exactly(3))
+      ->method('addRole')
+      ->with($this->logicalOr(
+        $this->equalTo('manager'),
+        $this->equalTo('editor'),
+        $this->equalTo('administrator')
+      ));
+    // Mock save.
     $account->expects($this->once())
       ->method('save');
 
