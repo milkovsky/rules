@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rules\Plugin\Action\FetchEntityById.
+ * Contains \Drupal\rules\Plugin\Action\EntityFetchById.
  */
 
 namespace Drupal\rules\Plugin\Action;
@@ -13,11 +13,11 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a 'Fetch entity by id' action.
+ * Provides a 'Entity fetch by id' action.
  *
  * @Action(
- *   id = "rules_fetch_entity_by_id",
- *   label = @Translation("Fetch entity by id"),
+ *   id = "rules_entity_fetch_by_id",
+ *   label = @Translation("Entity fetch by id"),
  *   category = @Translation("Entity"),
  *   context = {
  *     "entity_type_id" = @ContextDefinition("string",
@@ -39,7 +39,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @todo: Add access callback information from Drupal 7.
  * @todo: port for rules_entity_action_type_options.
  */
-class FetchEntityById extends RulesActionBase implements ContainerFactoryPluginInterface {
+class EntityFetchById extends RulesActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity manager service.
@@ -49,7 +49,7 @@ class FetchEntityById extends RulesActionBase implements ContainerFactoryPluginI
   protected $entityManager;
 
   /**
-   * Constructs a FetchEntityById object.
+   * Constructs a EntityFetchById object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -81,7 +81,7 @@ class FetchEntityById extends RulesActionBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function summary() {
-    return $this->t('Fetch entity by id');
+    return $this->t('Entity fetch by id');
   }
 
   /**
@@ -92,6 +92,9 @@ class FetchEntityById extends RulesActionBase implements ContainerFactoryPluginI
     $entity_id = $this->getContextValue('entity_id');
     $storage = $this->entityManager->getStorage($entity_type_id);
     $entity = $storage->load($entity_id);
+    // @todo Refine the provided context definition for 'entity'. Example: if
+    //  the loaded entity is a node then the provided context definition should
+    //  use the type node. We don't have an API for that yet.
     $this->setProvidedValue('entity', $entity);
   }
 }

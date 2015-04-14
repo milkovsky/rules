@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\rules\Tests\Integration\Action\FetchEntityByIdTest.
+ * Contains \Drupal\rules\Tests\Integration\Action\EntityFetchByIdTest.
  */
 
 namespace Drupal\Tests\rules\Integration\Action;
@@ -13,7 +13,7 @@ use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
  * @coversDefaultClass \Drupal\rules\Plugin\Action\FetchEntityById
  * @group rules_action
  */
-class FetchEntityByIdTest extends RulesEntityIntegrationTestBase {
+class EntityFetchByIdTest extends RulesEntityIntegrationTestBase {
 
   /**
    * The action to be tested.
@@ -52,7 +52,7 @@ class FetchEntityByIdTest extends RulesEntityIntegrationTestBase {
       ->willReturn(['test' => ['label' => 'Test']]);
     $this->container->set('entity.manager', $this->entityManager);
 
-    $this->action = $this->actionManager->createInstance('rules_fetch_entity_by_id');
+    $this->action = $this->actionManager->createInstance('rules_entity_fetch_by_id');
   }
 
   /**
@@ -61,7 +61,7 @@ class FetchEntityByIdTest extends RulesEntityIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Fetch entity by id', $this->action->summary());
+    $this->assertEquals('Entity fetch by id', $this->action->summary());
   }
 
   /**
