@@ -45,10 +45,6 @@ class UserRoleAdd extends RulesActionBase {
   public function execute() {
     $account = $this->getContextValue('user');
     $roles = $this->getContextValue('roles');
-
-    //@todo: Deal with the anonymous role. Invalid argument exception.
-    //@todo: Implement auto-save functionality. Let rules to deal with user save.
-
     if ($account !== FALSE) {
       // Indicates if the user account was changed.
       $user_is_changed = FALSE;
@@ -58,12 +54,16 @@ class UserRoleAdd extends RulesActionBase {
           // For efficiency manually save the original account before applying
           // any changes.
           $account->original = clone $account;
+          // If you try to add anonymous or authenticated role to user, Drupal
+          // will throw an \InvalidArgumentException. Anonymous or authenticated
+          // role ID must not be assigned manually.
           $account->addRole($role->id());
           $user_is_changed = TRUE;
         }
       }
       // Save user only in case of change.
       if ($user_is_changed) {
+        //@todo: Implement auto-save functionality. See EntitySave action.
         $account->save();
       }
     }

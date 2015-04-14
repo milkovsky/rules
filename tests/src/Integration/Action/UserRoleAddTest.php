@@ -9,6 +9,7 @@ namespace Drupal\Tests\rules\Integration\Action;
 
 use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
 use Drupal\Tests\rules\Integration\RulesUserIntegrationTestTrait;
+use Drupal\user\RoleInterface;
 
 /**
  * @coversDefaultClass \Drupal\rules\Plugin\Action\UserRoleAdd
@@ -135,13 +136,11 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
         $this->equalTo('administrator')
       ))
       ->will($this->returnCallback(
-        function($id) {
-          if ($id == 'administrator') {
+        function($rid) {
+          if ($rid == 'administrator') {
             return TRUE;
           }
-          else {
-            return FALSE;
-          }
+          return FALSE;
         }
       ));
 
@@ -159,6 +158,42 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
     $this->action
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator, $editor])
+      ->execute();
+  }
+
+  /**
+   * Tests adding of the 'anonymous' role to user.
+   *
+   * @expectedException \InvalidArgumentException
+   */
+  function testAddAnonymousRole() {
+    // Set-up a mock user.
+    $account = $this->getMockUser();
+    $account->expects($this->never())
+      ->method('save');
+    // If you try to add anonymous or authenticated role to user, Drupal will
+    // throw an \InvalidArgumentException. Anonymous or authenticated role ID
+    // must not be assigned manually.
+    $account->expects($this->once())
+      ->method('hasRole')
+      ->with($this->logicalOr(
+        $this->equalTo(RoleInterface::ANONYMOUS_ID)
+      ))
+      ->will($this->returnCallback(
+        function($rid) {
+          if (in_array($rid, [RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID])) {
+            throw new \InvalidArgumentException('Anonymous or authenticated role ID must not be assigned manually.');
+          }
+        }
+      ));
+
+    // Mock the 'anonymous' user role.
+    $anonymous = $this->getMockUserRole(RoleInterface::ANONYMOUS_ID);
+
+    // Test adding of the 'anonymous' role.
+    $this->action
+      ->setContextValue('user', $account)
+      ->setContextValue('roles', [$anonymous])
       ->execute();
   }
 
