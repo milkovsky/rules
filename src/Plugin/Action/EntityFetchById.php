@@ -13,11 +13,11 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a 'Entity fetch by id' action.
+ * Provides a 'Fetch entity by id' action.
  *
  * @Action(
  *   id = "rules_entity_fetch_by_id",
- *   label = @Translation("Entity fetch by id"),
+ *   label = @Translation("Fetch entity by id"),
  *   category = @Translation("Entity"),
  *   context = {
  *     "entity_type_id" = @ContextDefinition("string",
@@ -81,7 +81,7 @@ class EntityFetchById extends RulesActionBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function summary() {
-    return $this->t('Entity fetch by id');
+    return $this->t('Fetch entity by id');
   }
 
   /**

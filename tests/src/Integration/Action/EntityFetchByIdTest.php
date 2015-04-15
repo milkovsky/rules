@@ -67,7 +67,7 @@ class EntityFetchByIdTest extends RulesEntityIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Entity fetch by id', $this->action->summary());
+    $this->assertEquals('Fetch entity by id', $this->action->summary());
   }
 
   /**
