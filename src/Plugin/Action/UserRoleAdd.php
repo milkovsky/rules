@@ -33,6 +33,13 @@ use Drupal\rules\Core\RulesActionBase;
 class UserRoleAdd extends RulesActionBase {
 
   /**
+   * Flag that indicates if the entity should be auto-saved later.
+   *
+   * @var bool
+   */
+  protected $saveLater = TRUE;
+
+  /**
    * {@inheritdoc}
    */
   public function summary() {
@@ -45,8 +52,6 @@ class UserRoleAdd extends RulesActionBase {
   public function execute() {
     $account = $this->getContextValue('user');
     $roles = $this->getContextValue('roles');
-    // Indicates if the user account was changed.
-    $user_is_changed = FALSE;
     foreach ($roles as $role) {
       // Skip adding the role to the user if they already have it.
       if (!$account->hasRole($role->id())) {
@@ -54,13 +59,7 @@ class UserRoleAdd extends RulesActionBase {
         // will throw an \InvalidArgumentException. Anonymous or authenticated
         // role ID must not be assigned manually.
         $account->addRole($role->id());
-        $user_is_changed = TRUE;
       }
-    }
-    // Save user only in case of change.
-    if ($user_is_changed) {
-      //@todo: Implement auto-save functionality. See EntitySave action.
-      $account->save();
     }
   }
 }

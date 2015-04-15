@@ -45,11 +45,11 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   }
 
   /**
-   * Tests adding of one role to user.
+   * Tests adding of one role to user. User should not be saved.
    *
    * @covers ::execute()
    */
-  public function testAddOneRole() {
+  public function testAddOneRoleNoSave() {
     // Set-up a mock user.
     $account = $this->getMockedUser();
     $account->expects($this->once())
@@ -59,7 +59,9 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
     $account->expects($this->once())
       ->method('addRole')
       ->with($this->equalTo('administrator'));
-    $account->expects($this->once())
+    // We do noe expect call fo the 'save' method because user should be
+    // auto-saved later.
+    $account->expects($this->never())
       ->method('save');
 
     // Mock the 'administrator' user role.
@@ -97,9 +99,6 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
         $this->equalTo('editor'),
         $this->equalTo('administrator')
       ));
-    // Mock save.
-    $account->expects($this->once())
-      ->method('save');
 
     // Mock user roles.
     $manager = $this->getMockedUserRole('manager');
@@ -126,11 +125,9 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->with($this->equalTo('administrator'))
       ->will($this->returnValue(TRUE));
 
-    // We do not expect call of 'save' and 'addRole' methods.
+    // We do not expect a call of the 'addRole' method.
     $account->expects($this->never())
       ->method('addRole');
-    $account->expects($this->never())
-      ->method('save');
 
     // Mock the 'administrator' user role.
     $administrator = $this->getMockedUserRole('administrator');
@@ -165,11 +162,9 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
         }
       ));
 
-    // We expect only one call of 'save' and 'addRole' methods.
+    // We expect only one call of the 'addRole' method.
     $account->expects($this->once())
       ->method('addRole');
-    $account->expects($this->once())
-      ->method('save');
 
     // Mock user roles.
     $editor = $this->getMockedUserRole('editor');
@@ -190,8 +185,6 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   function testAddAnonymousRole() {
     // Set-up a mock user.
     $account = $this->getMockedUser();
-    $account->expects($this->never())
-      ->method('save');
     // If you try to add anonymous or authenticated role to user, Drupal will
     // throw an \InvalidArgumentException. Anonymous or authenticated role ID
     // must not be assigned manually.
