@@ -18,7 +18,7 @@ trait RulesUserIntegrationTestTrait {
    * @return \Drupal\user\UserInterface|\PHPUnit_Framework_MockObject_MockObject
    *   The mocked user.
    */
-  protected function getMockUser() {
+  protected function getMockedUser() {
     return $this->getMock('Drupal\user\UserInterface');
   }
 
@@ -31,7 +31,7 @@ trait RulesUserIntegrationTestTrait {
    * @return \Drupal\user\RoleInterface|\PHPUnit_Framework_MockObject_MockBuilder
    *   The mocked role.
    */
-  protected function getMockUserRole($name) {
+  protected function getMockedUserRole($name) {
     $role = $this->getMockBuilder('Drupal\user\RoleInterface')
       ->getMock();
 

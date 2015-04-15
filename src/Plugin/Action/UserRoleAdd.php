@@ -14,7 +14,7 @@ use Drupal\rules\Core\RulesActionBase;
  *
  * @action(
  *   id = "rules_user_role_add",
- *   label = @Translation("Adds roles to a particular user"),
+ *   label = @Translation("Add user role"),
  *   category = @Translation("User"),
  *   context = {
  *     "user" = @ContextDefinition("entity:user",
@@ -50,9 +50,6 @@ class UserRoleAdd extends RulesActionBase {
     foreach ($roles as $role) {
       // Skip adding the role to the user if they already have it.
       if (!$account->hasRole($role->id())) {
-        // For efficiency manually save the original account before applying
-        // any changes.
-        $account->original = clone $account;
         // If you try to add anonymous or authenticated role to user, Drupal
         // will throw an \InvalidArgumentException. Anonymous or authenticated
         // role ID must not be assigned manually.

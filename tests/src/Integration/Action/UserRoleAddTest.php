@@ -51,7 +51,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    */
   public function testAddOneRole() {
     // Set-up a mock user.
-    $account = $this->getMockUser();
+    $account = $this->getMockedUser();
     $account->expects($this->once())
       ->method('hasRole')
       ->with($this->equalTo('administrator'))
@@ -63,7 +63,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->method('save');
 
     // Mock the 'administrator' user role.
-    $administrator = $this->getMockUserRole('administrator');
+    $administrator = $this->getMockedUserRole('administrator');
 
     // Test adding of one role.
     $this->action
@@ -79,7 +79,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    */
   public function testAddThreeRoles() {
     // Set-up a mock user.
-    $account = $this->getMockUser();
+    $account = $this->getMockedUser();
     // Mock hasRole.
     $account->expects($this->exactly(3))
       ->method('hasRole')
@@ -102,9 +102,9 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->method('save');
 
     // Mock user roles.
-    $manager = $this->getMockUserRole('manager');
-    $editor = $this->getMockUserRole('editor');
-    $administrator = $this->getMockUserRole('administrator');
+    $manager = $this->getMockedUserRole('manager');
+    $editor = $this->getMockedUserRole('editor');
+    $administrator = $this->getMockedUserRole('administrator');
 
     // Test adding of three roles role.
     $this->action
@@ -120,7 +120,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    */
   public function testAddExistingRole() {
     // Set-up a mock user with role 'administrator'.
-    $account = $this->getMockUser();
+    $account = $this->getMockedUser();
     $account->expects($this->once())
       ->method('hasRole')
       ->with($this->equalTo('administrator'))
@@ -133,7 +133,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->method('save');
 
     // Mock the 'administrator' user role.
-    $administrator = $this->getMockUserRole('administrator');
+    $administrator = $this->getMockedUserRole('administrator');
 
     // Test adding one role.
     $this->action
@@ -149,7 +149,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    */
   public function testAddExistingAndNonexistentRole() {
     // Set-up a mock user with role 'administrator' but without 'editor'.
-    $account = $this->getMockUser();
+    $account = $this->getMockedUser();
     $account->expects($this->exactly(2))
       ->method('hasRole')
       ->with($this->logicalOr(
@@ -172,8 +172,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->method('save');
 
     // Mock user roles.
-    $editor = $this->getMockUserRole('editor');
-    $administrator = $this->getMockUserRole('administrator');
+    $editor = $this->getMockedUserRole('editor');
+    $administrator = $this->getMockedUserRole('administrator');
 
     // Test adding one role.
     $this->action
@@ -189,7 +189,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    */
   function testAddAnonymousRole() {
     // Set-up a mock user.
-    $account = $this->getMockUser();
+    $account = $this->getMockedUser();
     $account->expects($this->never())
       ->method('save');
     // If you try to add anonymous or authenticated role to user, Drupal will
@@ -209,7 +209,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ));
 
     // Mock the 'anonymous' user role.
-    $anonymous = $this->getMockUserRole(RoleInterface::ANONYMOUS_ID);
+    $anonymous = $this->getMockedUserRole(RoleInterface::ANONYMOUS_ID);
 
     // Test adding of the 'anonymous' role.
     $this->action
