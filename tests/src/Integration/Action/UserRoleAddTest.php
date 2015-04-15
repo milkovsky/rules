@@ -38,7 +38,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   /**
    * Tests the summary.
    *
-   * @covers ::summary()
+   * @covers ::summary
    */
   public function testSummary() {
     $this->assertEquals('Adds roles to a particular user', $this->action->summary());
@@ -47,7 +47,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   /**
    * Tests adding of one role to user. User should not be saved.
    *
-   * @covers ::execute()
+   * @covers ::execute
    */
   public function testAddOneRoleNoSave() {
     // Set-up a mock user.
@@ -77,7 +77,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   /**
    * Tests adding of three roles to user.
    *
-   * @covers ::execute()
+   * @covers ::execute
    */
   public function testAddThreeRoles() {
     // Set-up a mock user.
@@ -115,7 +115,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   /**
    * Tests adding of existing role to user.
    *
-   * @covers ::execute()
+   * @covers ::execute
    */
   public function testAddExistingRole() {
     // Set-up a mock user with role 'administrator'.
@@ -142,7 +142,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
   /**
    * Tests adding of one existing and one nonexistent role to user.
    *
-   * @covers ::execute()
+   * @covers ::execute
    */
   public function testAddExistingAndNonexistentRole() {
     // Set-up a mock user with role 'administrator' but without 'editor'.
