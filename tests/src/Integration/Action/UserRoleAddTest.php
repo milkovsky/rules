@@ -59,7 +59,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
     $account->expects($this->once())
       ->method('addRole')
       ->with($this->equalTo('administrator'));
-    // We do noe expect call fo the 'save' method because user should be
+    // We do noe expect call of the 'save' method because user should be
     // auto-saved later.
     $account->expects($this->never())
       ->method('save');
