@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\rules\Integration\Action\AliasDeleteTest.
+ * Contains \Drupal\Tests\rules\Integration\Action\PathAliasDeleteByPathTest.
  */
 
 namespace Drupal\Tests\rules\Integration\Action;
@@ -10,10 +10,10 @@ namespace Drupal\Tests\rules\Integration\Action;
 use Drupal\Tests\rules\Integration\RulesIntegrationTestBase;
 
 /**
- * @coversDefaultClass \Drupal\rules\Plugin\Action\AliasDelete
- * @group rules_action
+ * @coversDefaultClass \Drupal\rules\Plugin\Action\PathAliasDeleteByPath
+ * @group rules_actions
  */
-class AliasDeleteTest extends RulesIntegrationTestBase {
+class PathAliasDeleteByPathTest extends RulesIntegrationTestBase {
 
   /**
    * The action to be tested.
@@ -36,9 +36,11 @@ class AliasDeleteTest extends RulesIntegrationTestBase {
     parent::setUp();
 
     $this->aliasStorage = $this->getMock('Drupal\Core\Path\AliasStorageInterface');
+
+    $this->aliasStorage = $this->getMock('Drupal\Core\Path\AliasStorageInterface');
     $this->container->set('path.alias_storage', $this->aliasStorage);
 
-    $this->action = $this->actionManager->createInstance('rules_path_alias_delete');
+    $this->action = $this->actionManager->createInstance('rules_path_alias_delete_by_path');
   }
 
   /**
@@ -47,7 +49,7 @@ class AliasDeleteTest extends RulesIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Delete any path alias', $this->action->summary());
+    $this->assertEquals('Delete alias for a path', $this->action->summary());
   }
 
   /**
@@ -56,14 +58,15 @@ class AliasDeleteTest extends RulesIntegrationTestBase {
    * @covers ::execute
    */
   public function testActionExecution() {
-    $alias = 'about/team';
+
+    $path = 'node/1';
 
     $this->aliasStorage->expects($this->once())
       ->method('delete')
-      ->with(['alias' => $alias]);
+      ->with(['path' => $path]);
 
     $this->action
-      ->setContextValue('alias', $alias);
+      ->setContextValue('path', $path);
 
     $this->action->execute();
   }

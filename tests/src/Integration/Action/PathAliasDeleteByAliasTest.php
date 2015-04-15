@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\rules\Integration\Action\PathAliasDeleteTest.
+ * Contains \Drupal\Tests\rules\Integration\Action\PathAliasDeleteByAliasTest.
  */
 
 namespace Drupal\Tests\rules\Integration\Action;
@@ -10,10 +10,10 @@ namespace Drupal\Tests\rules\Integration\Action;
 use Drupal\Tests\rules\Integration\RulesIntegrationTestBase;
 
 /**
- * @coversDefaultClass \Drupal\rules\Plugin\Action\PathAliasDelete
- * @group rules_action
+ * @coversDefaultClass \Drupal\rules\Plugin\Action\PathAliasDeleteByAlias
+ * @group rules_actions
  */
-class PathAliasDeleteTest extends RulesIntegrationTestBase {
+class PathAliasDeleteByAliasTest extends RulesIntegrationTestBase {
 
   /**
    * The action to be tested.
@@ -36,11 +36,9 @@ class PathAliasDeleteTest extends RulesIntegrationTestBase {
     parent::setUp();
 
     $this->aliasStorage = $this->getMock('Drupal\Core\Path\AliasStorageInterface');
-
-    $this->aliasStorage = $this->getMock('Drupal\Core\Path\AliasStorageInterface');
     $this->container->set('path.alias_storage', $this->aliasStorage);
 
-    $this->action = $this->actionManager->createInstance('rules_path_aliases_delete');
+    $this->action = $this->actionManager->createInstance('rules_path_alias_delete_by_alias');
   }
 
   /**
@@ -49,7 +47,7 @@ class PathAliasDeleteTest extends RulesIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Delete alias for a path', $this->action->summary());
+    $this->assertEquals('Delete any path alias', $this->action->summary());
   }
 
   /**
@@ -58,15 +56,14 @@ class PathAliasDeleteTest extends RulesIntegrationTestBase {
    * @covers ::execute
    */
   public function testActionExecution() {
-
-    $path = 'node/1';
+    $alias = 'about/team';
 
     $this->aliasStorage->expects($this->once())
       ->method('delete')
-      ->with(['path' => $path]);
+      ->with(['alias' => $alias]);
 
     $this->action
-      ->setContextValue('path', $path);
+      ->setContextValue('alias', $alias);
 
     $this->action->execute();
   }
