@@ -72,6 +72,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator])
       ->execute();
+    $this->action->autoSaveContext();
   }
 
   /**
@@ -110,6 +111,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$manager, $editor, $administrator])
       ->execute();
+    $this->action->autoSaveContext();
   }
 
   /**
@@ -137,6 +139,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator])
       ->execute();
+    $this->action->autoSaveContext();
   }
 
   /**
@@ -175,6 +178,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator, $editor])
       ->execute();
+    $this->action->autoSaveContext();
   }
 
   /**
@@ -209,6 +213,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$anonymous])
       ->execute();
+    $this->action->autoSaveContext();
   }
 
 }

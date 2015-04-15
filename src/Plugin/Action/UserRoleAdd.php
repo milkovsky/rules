@@ -21,7 +21,7 @@ use Drupal\rules\Core\RulesActionBase;
  *       label = @Translation("User")
  *     ),
  *     "roles" = @ContextDefinition("entity:user_role",
- *       label = @Translation("Entity"),
+ *       label = @Translation("Roles"),
  *       multiple = TRUE
  *     )
  *   }
@@ -59,7 +59,20 @@ class UserRoleAdd extends RulesActionBase {
         // will throw an \InvalidArgumentException. Anonymous or authenticated
         // role ID must not be assigned manually.
         $account->addRole($role->id());
+        // Set flag that indicates if the entity should be auto-saved later.
+        $this->saveLater = TRUE;
       }
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function autoSaveContext() {
+    if ($this->saveLater) {
+      return ['user'];
+    }
+    return [];
+  }
+
 }
