@@ -1,0 +1,4 @@
+administer rules:
+  title: Administer rule configurations
+  description: Administer rule configurations including events, conditions and actions for which the user has sufficient access permissions.
+  restrict access: true
