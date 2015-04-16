@@ -41,7 +41,7 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Adds roles to a particular user', $this->action->summary());
+    $this->assertEquals('Add user role', $this->action->summary());
   }
 
   /**

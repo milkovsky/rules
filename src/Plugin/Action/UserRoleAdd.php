@@ -12,7 +12,7 @@ use Drupal\rules\Core\RulesActionBase;
 /**
  * Provides a 'Add user role' action.
  *
- * @action(
+ * @Action(
  *   id = "rules_user_role_add",
  *   label = @Translation("Add user role"),
  *   category = @Translation("User"),
@@ -43,7 +43,7 @@ class UserRoleAdd extends RulesActionBase {
    * {@inheritdoc}
    */
   public function summary() {
-    return $this->t('Adds roles to a particular user');
+    return $this->t('Add user role');
   }
 
   /**
