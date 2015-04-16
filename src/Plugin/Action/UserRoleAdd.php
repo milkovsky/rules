@@ -37,7 +37,7 @@ class UserRoleAdd extends RulesActionBase {
    *
    * @var bool
    */
-  protected $saveLater = TRUE;
+  protected $saveLater = FALSE;
 
   /**
    * {@inheritdoc}

@@ -72,7 +72,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator])
       ->execute();
-    $this->action->autoSaveContext();
+
+    $this->assertEquals($this->action->autoSaveContext(), ['user'], 'Action returns the user context name for auto saving.');
   }
 
   /**
@@ -111,7 +112,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$manager, $editor, $administrator])
       ->execute();
-    $this->action->autoSaveContext();
+
+    $this->assertEquals($this->action->autoSaveContext(), ['user'], 'Action returns the user context name for auto saving.');
   }
 
   /**
@@ -139,7 +141,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator])
       ->execute();
-    $this->action->autoSaveContext();
+
+    $this->assertEquals($this->action->autoSaveContext(), [], 'Action returns nothing for auto saving since the user has been saved already.');
   }
 
   /**
@@ -178,7 +181,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$administrator, $editor])
       ->execute();
-    $this->action->autoSaveContext();
+
+    $this->assertEquals($this->action->autoSaveContext(), ['user'], 'Action returns the user context name for auto saving.');
   }
 
   /**
@@ -213,7 +217,8 @@ class UserRoleAddTest extends RulesEntityIntegrationTestBase {
       ->setContextValue('user', $account)
       ->setContextValue('roles', [$anonymous])
       ->execute();
-    $this->action->autoSaveContext();
+
+    $this->assertEquals($this->action->autoSaveContext(), [], 'Action returns nothing for auto saving since the user has been saved already.');
   }
 
 }
