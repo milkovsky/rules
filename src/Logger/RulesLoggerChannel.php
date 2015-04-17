@@ -54,8 +54,8 @@ class RulesLoggerChannel extends LoggerChannel {
     ];
 
     // Log message only if rules logging setting is enabled.
-    if ($this->config->get('debug_log')) {
-      if ($this->levelTranslation[$this->config->get('log_errors')] >= $this->levelTranslation[$level]) {
+    if ($this->config->get('log')) {
+      if ($this->levelTranslation[$this->config->get('log_level')] >= $this->levelTranslation[$level]) {
         parent::log($level, $message, $context);
       }
     }

@@ -7,66 +7,70 @@
 
 namespace Drupal\rules\Form;
 
-use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\rules\Engine\RulesLog;
+use Drupal\Core\Form\ConfigFormBase;
+use Psr\Log\LogLevel;
 
 /**
  * Provides rules settings form.
  */
-class RulesSettingsForm extends FormBase {
+class RulesSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'rules_settings_Form';
+    return 'rules_settings_form';
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   */
+  protected function getEditableConfigNames() {
+    return ['rules.settings'];
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('rules.settings');
 
-    $form['rules_log_errors'] = array(
-      '#type' => 'radios',
-      '#title' => t('Logging of Rules evaluation errors'),
-      '#options' => array(
-        RulesLog::WARN => t('Log all warnings and errors'),
-        RulesLog::ERROR => t('Log errors only'),
-      ),
-      '#default_value' => $config->get('log_errors') ? $config->get('log_errors') : RulesLog::WARN,
-      '#description' => t('Evaluations errors are logged to the system log.'),
-    );
-
-    $form['debug']['rules_debug_log'] = array(
+    $form['log'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Log debug information to the system log'),
-      '#default_value' => $config->get('debug_log'),
+      '#title' => t('Log debug information'),
+      '#default_value' => $config->get('log'),
+    );
+    $form['log_level'] = array(
+      '#type' => 'radios',
+      '#title' => t('Log level'),
+      '#options' => array(
+        LogLevel::WARNING => t('Log all warnings and errors'),
+        LogLevel::ERROR => t('Log errors only'),
+      ),
+      '#default_value' => $config->get('log_level') ? $config->get('log_level') : LogLevel::WARNING,
+      '#description' => t('Evaluations errors are logged to available loggers.'),
+      '#states' => array(
+        // Hide the regions settings when the debug log is disabled.
+        'invisible' => array(
+          'input[name="log"]' => array('checked' => FALSE),
+        ),
+      ),
     );
 
-    return $form;
+    return parent::buildForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $langcode = $this->languageManager->getCurrentLanguage()->getId();
+    $this->config('rules.settings')
+      ->set('log', $form_state->getValue('log'))
+      ->set('log_level', $form_state->getValue('log_level'))
+      ->save();
 
-    $account = $form_state->getValue('account');
-    // Mail one time login URL and instructions using current language.
-    $mail = _user_mail_notify('password_reset', $account, $langcode);
-    if (!empty($mail)) {
-      $this->logger('user')->notice('Password reset instructions mailed to %name at %email.', array('%name' => $account->getUsername(), '%email' => $account->getEmail()));
-      drupal_set_message($this->t('Further instructions have been sent to your email address.'));
-    }
-
-    $form_state->setRedirect('user.page');
+    parent::submitForm($form, $form_state);
   }
 
 }
