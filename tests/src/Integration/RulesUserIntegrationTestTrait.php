@@ -8,7 +8,7 @@
 namespace Drupal\Tests\rules\Integration;
 
 /**
- * Base class for Rules integration tests with user entities.
+ * Trait for Rules integration tests with user entities.
  */
 trait RulesUserIntegrationTestTrait {
 
