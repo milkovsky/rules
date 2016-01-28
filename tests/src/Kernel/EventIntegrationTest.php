@@ -157,4 +157,32 @@ class EventIntegrationTest extends RulesDrupalTestBase {
     $this->assertRulesLogEntryExists('action called');
   }
 
+  /**
+   * Test that Drupal initializing triggers the Rules logger listener.
+   */
+  public function testInitEvent() {
+    $rule = $this->expressionManager->createRule();
+    $rule->addCondition('rules_test_true');
+    $rule->addAction('rules_test_log');
+
+    $config_entity = $this->storage->create([
+      'id' => 'test_rule',
+      'expression_id' => 'rules_rule',
+      'event' => 'rules_system_logger_event',# @todo which event should we use?
+      'configuration' => $rule->getConfiguration(),
+    ]);
+    $config_entity->save();
+
+    // Rebuild the container so that the newly configured event gets picked up.
+    $this->container->get('kernel')->rebuildContainer();
+    // The logger instance has changed, refresh it.
+    $this->logger = $this->container->get('logger.channel.rules');
+
+    # @todo trigger Drupal init here.
+    #$this->container->get('cron')->run();
+
+    // Test that the action in the rule logged something.
+    $this->assertRulesLogEntryExists('action called');
+  }
+
 }
