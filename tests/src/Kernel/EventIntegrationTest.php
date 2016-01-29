@@ -9,6 +9,7 @@ namespace Drupal\Tests\rules\Kernel;
 
 use Drupal\rules\Context\ContextConfig;
 use Drupal\user\Entity\User;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Test for the Symfony event mapping to Rules events.
@@ -168,7 +169,7 @@ class EventIntegrationTest extends RulesDrupalTestBase {
     $config_entity = $this->storage->create([
       'id' => 'test_rule',
       'expression_id' => 'rules_rule',
-      'event' => 'rules_system_logger_event',# @todo which event should we use?
+      'event' => KernelEvents::REQUEST,
       'configuration' => $rule->getConfiguration(),
     ]);
     $config_entity->save();
@@ -178,8 +179,17 @@ class EventIntegrationTest extends RulesDrupalTestBase {
     // The logger instance has changed, refresh it.
     $this->logger = $this->container->get('logger.channel.rules');
 
-    # @todo trigger Drupal init here.
-    #$this->container->get('cron')->run();
+    $dispatcher = $this->container->get('event_dispatcher');
+
+    // Remove all the listeners except Rules before triggering an event.
+    $listeners = $dispatcher->getListeners(KernelEvents::REQUEST);
+    foreach ($listeners as $listener) {
+      if (empty($listener[1]) || $listener[1] != 'onRulesEvent') {
+        $dispatcher->removeListener(KernelEvents::REQUEST, $listener);
+      }
+    }
+    // Manually trigger the initialization event.
+    $dispatcher->dispatch(KernelEvents::REQUEST);
 
     // Test that the action in the rule logged something.
     $this->assertRulesLogEntryExists('action called');
