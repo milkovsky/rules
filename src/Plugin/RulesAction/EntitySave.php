@@ -8,32 +8,21 @@
 namespace Drupal\rules\Plugin\RulesAction;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\rules\Core\RulesActionBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Save entity' action.
  *
  * @RulesAction(
  *   id = "rules_entity_save",
- *   label = @Translation("Save entity"),
- *   category = @Translation("Entity"),
- *   context = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity"),
- *       description = @Translation("Specifies the entity, which should be saved permanently.")
- *     ),
- *     "immediate" = @ContextDefinition("boolean",
- *       label = @Translation("Force saving immediately"),
- *       description = @Translation("Usually saving is postponed till the end of the evaluation, so that multiple saves can be fold into one. If this set, saving is forced to happen immediately."),
- *       default_value = NULL,
- *       required = FALSE
- *     )
- *   }
+ *   deriver = "Drupal\rules\Plugin\RulesAction\EntitySaveDeriver",
  * )
  *
  * @todo: Add access callback information from Drupal 7.
  */
-class EntitySave extends RulesActionBase {
+class EntitySave extends RulesActionBase implements ContainerFactoryPluginInterface{
 
   /**
    * Flag that indicates if the entity should be auto-saved later.
@@ -41,6 +30,18 @@ class EntitySave extends RulesActionBase {
    * @var bool
    */
   protected $saveLater = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager')->getStorage($plugin_definition['entity_type_id'])
+    );
+  }
 
   /**
    * Saves the Entity.
