@@ -20,9 +20,16 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
   /**
    * List of conditions that are evaluated.
    *
-   * @var \Drupal\rules\Core\RulesConditionInterface[]
+   * @var \Drupal\rules\Engine\ConditionExpressionInterface[]
    */
   protected $conditions = [];
+
+  /**
+   * The expression manager.
+   *
+   * @var \Drupal\rules\Engine\ExpressionManagerInterface
+   */
+  protected $expressionManager;
 
   /**
    * Constructs a new class instance.
@@ -193,10 +200,12 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
    */
   public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state) {
     $violation_list = new IntegrityViolationList();
+    $this->prepareExecutionMetadataStateBeforeTraversal($metadata_state);
     foreach ($this->conditions as $condition) {
       $condition_violations = $condition->checkIntegrity($metadata_state);
       $violation_list->addAll($condition_violations);
     }
+    $this->prepareExecutionMetadataStateAfterTraversal($metadata_state);
     return $violation_list;
   }
 
@@ -204,26 +213,38 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
    * {@inheritdoc}
    */
   public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL) {
-    if ($until) {
-      if ($this->getUuid() === $until->getUuid()) {
+    if ($until && $this->getUuid() === $until->getUuid()) {
+      return TRUE;
+    }
+    $this->prepareExecutionMetadataStateBeforeTraversal($metadata_state);
+    foreach ($this->conditions as $condition) {
+      $found = $condition->prepareExecutionMetadataState($metadata_state, $until);
+      // If the expression was found, we need to stop.
+      if ($found) {
         return TRUE;
       }
-      foreach ($this->conditions as $condition) {
-        if ($condition->getUuid() === $until->getUuid()) {
-          return TRUE;
-        }
-        $found = $condition->prepareExecutionMetadataState($metadata_state, $until);
-        if ($found) {
-          return TRUE;
-        }
-      }
-      return FALSE;
     }
+    $this->prepareExecutionMetadataStateAfterTraversal($metadata_state);
+  }
 
-    foreach ($this->conditions as $condition) {
-      $condition->prepareExecutionMetadataState($metadata_state);
-    }
-    return TRUE;
+  /**
+   * Prepares execution metadata state before traversing through children.
+   *
+   * @see ::prepareExecutionMetadataState()
+   * @see ::checkIntegrity()
+   */
+  protected function prepareExecutionMetadataStateBeforeTraversal($metadata_state) {
+    // Any pre-traversal preparations need to be added here.
+  }
+
+  /**
+   * Prepares execution metadata state after traversing through children.
+   *
+   * @see ::prepareExecutionMetadataState()
+   * @see ::checkIntegrity()
+   */
+  protected function prepareExecutionMetadataStateAfterTraversal($metadata_state) {
+    // Any post-traversal preparations need to be added here.
   }
 
 }

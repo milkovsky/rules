@@ -25,6 +25,13 @@ abstract class ActionExpressionContainer extends ExpressionBase implements Actio
   protected $actions = [];
 
   /**
+   * The expression manager.
+   *
+   * @var \Drupal\rules\Engine\ExpressionManagerInterface
+   */
+  protected $expressionManager;
+
+  /**
    * Constructor.
    *
    * @param array $configuration
@@ -165,10 +172,12 @@ abstract class ActionExpressionContainer extends ExpressionBase implements Actio
    */
   public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state) {
     $violation_list = new IntegrityViolationList();
+    $this->prepareExecutionMetadataStateBeforeTraversal($metadata_state);
     foreach ($this->actions as $action) {
       $action_violations = $action->checkIntegrity($metadata_state);
       $violation_list->addAll($action_violations);
     }
+    $this->prepareExecutionMetadataStateAfterTraversal($metadata_state);
     return $violation_list;
   }
 
@@ -176,26 +185,38 @@ abstract class ActionExpressionContainer extends ExpressionBase implements Actio
    * {@inheritdoc}
    */
   public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL) {
-    if ($until) {
-      if ($this->getUuid() === $until->getUuid()) {
+    if ($until && $this->getUuid() === $until->getUuid()) {
+      return TRUE;
+    }
+    $this->prepareExecutionMetadataStateBeforeTraversal($metadata_state);
+    foreach ($this->actions as $action) {
+      $found = $action->prepareExecutionMetadataState($metadata_state, $until);
+      // If the expression was found, we need to stop.
+      if ($found) {
         return TRUE;
       }
-      foreach ($this->actions as $action) {
-        if ($action->getUuid() === $until->getUuid()) {
-          return TRUE;
-        }
-        $found = $action->prepareExecutionMetadataState($metadata_state, $until);
-        if ($found) {
-          return TRUE;
-        }
-      }
-      return FALSE;
     }
+    $this->prepareExecutionMetadataStateAfterTraversal($metadata_state);
+  }
 
-    foreach ($this->actions as $action) {
-      $action->prepareExecutionMetadataState($metadata_state);
-    }
-    return TRUE;
+  /**
+   * Prepares execution metadata state before traversing through children.
+   *
+   * @see ::prepareExecutionMetadataState()
+   * @see ::checkIntegrity()
+   */
+  protected function prepareExecutionMetadataStateBeforeTraversal($metadata_state) {
+    // Any pre-traversal preparations need to be added here.
+  }
+
+  /**
+   * Prepares execution metadata state after traversing through children.
+   *
+   * @see ::prepareExecutionMetadataState()
+   * @see ::checkIntegrity()
+   */
+  protected function prepareExecutionMetadataStateAfterTraversal($metadata_state) {
+    // Any post-traversal preparations need to be added here.
   }
 
 }

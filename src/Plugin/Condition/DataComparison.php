@@ -21,11 +21,10 @@ use Drupal\rules\Core\RulesConditionBase;
  *       label = @Translation("Data to compare"),
  *       description = @Translation("The data to be checked to be empty, specified by using a data selector, e.g. 'node:uid:entity:name:value'.")
  *     ),
- *     "operator" = @ContextDefinition("string",
+ *     "operation" = @ContextDefinition("string",
  *       label = @Translation("Operator"),
- *       description = @Translation("The comparison operator."),
+ *       description = @Translation("The comparison operation."),
  *       default_value = "==",
- *       required = FALSE
  *     ),
  *     "value" = @ContextDefinition("any",
  *        label = @Translation("Data value"),
@@ -44,8 +43,8 @@ class DataComparison extends RulesConditionBase {
    *
    * @param mixed $data
    *   Supplied data to test.
-   * @param string $operator
-   *   Data comparison operator. Typically one of:
+   * @param string $operation
+   *   Data comparison operation. Typically one of:
    *     - "=="
    *     - "<"
    *     - ">"
@@ -57,9 +56,9 @@ class DataComparison extends RulesConditionBase {
    * @return bool
    *   The evaluation of the condition.
    */
-  protected function doEvaluate($data, $operator, $value) {
-    $operator = $operator ? $operator : '==';
-    switch ($operator) {
+  protected function doEvaluate($data, $operation, $value) {
+    $operation = $operation ? $operation : '==';
+    switch ($operation) {
       case '<':
         return $data < $value;
 
@@ -79,6 +78,18 @@ class DataComparison extends RulesConditionBase {
           return (isset($data) && isset($value)) || (!isset($data) && !isset($value));
         }
         return $data == $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function refineContextDefinitions(array $selected_data) {
+    if (isset($selected_data['data'])) {
+      $this->pluginDefinition['context']['value']->setDataType($selected_data['data']->getDataType());
+      if ($this->getContextValue('operation') == 'IN') {
+        $this->pluginDefinition['context']['value']->setMultiple();
+      }
     }
   }
 
