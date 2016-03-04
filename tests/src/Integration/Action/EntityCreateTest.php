@@ -47,31 +47,31 @@ class EntityCreateTest extends RulesEntityIntegrationTestBase {
     // and the mocked field definition is instantiated without the necessary
     // information.
     $bundle_field_definition->getCardinality()->willReturn(1)
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition->getType()->willReturn('string')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition->getLabel()->willReturn('Bundle')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition->getDescription()
       ->willReturn('Bundle mock description')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
 
     $bundle_field_definition_required->getCardinality()->willReturn(1)
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition_required->getType()->willReturn('string')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition_required->getLabel()->willReturn('Required field')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition_required->getDescription()
       ->willReturn('Required field mock description')
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
     $bundle_field_definition_required->isRequired()
       ->willReturn(TRUE)
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
 
     $bundle_field_definition_optional->isRequired()
       ->willReturn(FALSE)
-      ->shouldBeCalledTimes(2);
+      ->shouldBeCalled();
 
     // Prepare mocked entity storage.
     $entity_type_storage = $this->prophesize(EntityStorageBase::class);
