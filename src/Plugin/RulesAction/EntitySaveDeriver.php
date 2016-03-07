@@ -84,7 +84,7 @@ class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface
           'immediate' => ContextDefinition::create('boolean')
             ->setLabel($this->t('Force saving immediately'))
             ->setDescription($this->t('Usually saving is postponed till the end of the evaluation, so that multiple saves can be fold into one. If this set, saving is forced to happen immediately.'))
-            ->setDefaultValue(NULL)
+            ->setDefaultValue(FALSE)
             ->setRequired(FALSE),
         ],
       ] + $base_plugin_definition;
