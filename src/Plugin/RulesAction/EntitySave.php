@@ -23,7 +23,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *
  * @todo: Add access callback information from Drupal 7.
  */
-class EntitySave extends RulesActionBase implements ContainerFactoryPluginInterface{
+class EntitySave extends RulesActionBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity storage service.
