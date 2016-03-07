@@ -55,7 +55,11 @@ class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
-    return new static($container->get('entity_type.manager'), $container->get('entity_field.manager'), $container->get('string_translation'));
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager'),
+      $container->get('string_translation')
+    );
   }
 
   /**
@@ -72,37 +76,18 @@ class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface
         'label' => $this->t('Save @entity_type', ['@entity_type' => $entity_type->getLowercaseLabel()]),
         'category' => $entity_type->getLabel(),
         'entity_type_id' => $entity_type_id,
-        'context' => [],
-        'provides' => [
+        'context' => [
           'entity' => ContextDefinition::create("entity:$entity_type_id")
             ->setLabel($entity_type->getLabel())
+            ->setDescription($this->t('Specifies the entity, which should be saved permanently.'))
             ->setRequired(TRUE),
+          'immediate' => ContextDefinition::create('boolean')
+            ->setLabel($this->t('Force saving immediately'))
+            ->setDescription($this->t('Usually saving is postponed till the end of the evaluation, so that multiple saves can be fold into one. If this set, saving is forced to happen immediately.'))
+            ->setDefaultValue(NULL)
+            ->setRequired(FALSE),
         ],
       ] + $base_plugin_definition;
-      // Add a required context for the bundle key, and optional contexts for
-      // other required base fields. This matches the storage create() behavior,
-      // where only the bundle requirement is enforced.
-      $bundle_key = $entity_type->getKey('bundle');
-      $base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($entity_type_id);
-      foreach ($base_field_definitions as $field_name => $definition) {
-        if ($field_name != $bundle_key && !$definition->isRequired()) {
-          continue;
-        }
-
-        $is_bundle = ($field_name == $bundle_key);
-        $multiple = ($definition->getCardinality() === 1) ? FALSE : TRUE;
-        $context_definition = ContextDefinition::create($definition->getType())
-          ->setLabel($definition->getLabel())
-          ->setRequired($is_bundle)
-          ->setMultiple($multiple)
-          ->setDescription($definition->getDescription());
-
-        if ($is_bundle) {
-          $context_definition->setAssignmentRestriction(ContextDefinition::ASSIGNMENT_RESTRICTION_INPUT);
-        }
-
-        $this->derivatives[$entity_type_id]['context'][$field_name] = $context_definition;
-      }
     }
 
     return $this->derivatives;
