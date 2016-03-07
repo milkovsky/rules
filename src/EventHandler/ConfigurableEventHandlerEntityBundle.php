@@ -44,7 +44,7 @@ class ConfigurableEventHandlerEntityBundle extends ConfigurableEventHandlerBase 
     $this->entityTypeId = $plugin_definition['entity_type_id'];
     // @todo: This needs to use dependency injection.
     $this->entityInfo = \Drupal::entityTypeManager()->getDefinition($this->entityTypeId);
-    // @tdo: use EntityTypeBundleInfo service.
+    // @todo: use EntityTypeBundleInfo service.
     $this->bundlesInfo = \Drupal::entityManager()->getBundleInfo($this->entityTypeId);
     if (!$this->bundlesInfo) {
       throw new \InvalidArgumentException('Unsupported event name passed.');
@@ -68,7 +68,7 @@ class ConfigurableEventHandlerEntityBundle extends ConfigurableEventHandlerBase 
   public function summary() {
     $bundle = $this->configuration['bundle'];
     $bundle_label = isset($this->bundlesInfo[$bundle]['label']) ? $this->bundlesInfo[$bundle]['label'] : $bundle;
-    $suffix = isset($bundle) ? ' ' . t('of @bundle-key %name', array('@bundle-key' => $this->entityInfo->getBundleLabel(), '%name' => $bundle_label)) : '';
+    $suffix = isset($bundle) ? ' ' . t('of @bundle-key %name', ['@bundle-key' => $this->entityInfo->getBundleLabel(), '%name' => $bundle_label]) : '';
     return $this->pluginDefinition['label']->render() . $suffix;
   }
 
@@ -76,13 +76,13 @@ class ConfigurableEventHandlerEntityBundle extends ConfigurableEventHandlerBase 
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['bundle'] = array(
+    $form['bundle'] = [
       '#type' => 'select',
-      '#title' => t('Restrict by @bundle', array('@bundle' => $this->entityInfo->getBundleLabel())),
+      '#title' => t('Restrict by @bundle', ['@bundle' => $this->entityInfo->getBundleLabel()]),
       '#description' => t('If you need to filter for multiple values, either add multiple events or use the "Entity is of bundle" condition instead.'),
       '#default_value' => $this->configuration['bundle'],
       '#empty_value' => '',
-    );
+    ];
     foreach ($this->bundlesInfo as $name => $bundle_info) {
       $form['bundle']['#options'][$name] = $bundle_info['label'];
     }

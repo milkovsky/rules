@@ -83,21 +83,22 @@ abstract class RulesComponentFormBase extends EntityForm {
   }
 
   /**
-   * Get default form #ajax properties.
+   * Gets default form #ajax properties.
    *
    * @param string $effect
    *   (optional) The jQuery effect to use when placing the new HTML (used with
    *   'wrapper'). Valid options are 'none' (default), 'slide', or 'fade'.
    *
    * @return array
+   *   Default value form #ajax properties.
    */
   public function getDefaultAjax($effect = 'none') {
-    return array(
+    return [
       'callback' => '::reloadForm',
       'wrapper' => 'rules-form-wrapper',
       'effect' => $effect,
       'speed' => 'fast',
-    );
+    ];
   }
 
   /**

@@ -271,7 +271,7 @@ class ReactionRuleConfig extends ConfigEntityBase implements RulesUiComponentPro
       if (strpos($event_name, '--') !== FALSE) {
         // Cut off any suffix from a configured event name.
         $parts = explode('--', $event_name, 2);
-        $event_name =  $parts[0];
+        $event_name = $parts[0];
       }
       $names[] = $event_name;
     }

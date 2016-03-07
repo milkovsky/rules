@@ -74,14 +74,14 @@ class ReactionRuleAddForm extends RulesComponentFormBase {
       '#required' => TRUE,
       '#ajax' => $this->getDefaultAjax(),
       '#description' => $this->t('Whenever the event occurs, rule evaluation is triggered.'),
-      '#executes_submit_callback' => array('::submitForm'),
+      '#executes_submit_callback' => ['::submitForm'],
     ];
 
-    $form['event_configuration'] = array();
+    $form['event_configuration'] = [];
     if ($values = $form_state->getValue('events')) {
       $event_name = $values[0]['event_name'];
       if ($handler = $this->getEventHandler($event_name)) {
-        $form['event_configuration'] = $handler->buildConfigurationForm(array(), $form_state);
+        $form['event_configuration'] = $handler->buildConfigurationForm([], $form_state);
       }
     }
 
@@ -118,7 +118,7 @@ class ReactionRuleAddForm extends RulesComponentFormBase {
    *
    * Currently event handler is available only when the event is configurable.
    *
-   * @param $event_name
+   * @param string $event_name
    *   The event base name.
    * @param array $configuration
    *   The event configuration.
