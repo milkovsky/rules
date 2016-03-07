@@ -56,6 +56,14 @@ abstract class RulesActionBase extends ContextAwarePluginBase implements RulesAc
   /**
    * {@inheritdoc}
    */
+  public function assertMetadata(array $selected_data) {
+    // Nothing to assert by default.
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConfiguration() {
     return [
       'id' => $this->getPluginId(),
