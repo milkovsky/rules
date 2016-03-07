@@ -7,16 +7,15 @@
 
 namespace Drupal\rules\Plugin\RulesExpression;
 
-use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\rules\Context\ContextHandlerTrait;
 use Drupal\rules\Context\DataProcessorManager;
+use Drupal\rules\Core\ConditionManager;
 use Drupal\rules\Engine\ConditionExpressionInterface;
 use Drupal\rules\Engine\ExecutionMetadataStateInterface;
 use Drupal\rules\Engine\ExecutionStateInterface;
 use Drupal\rules\Engine\ExpressionBase;
 use Drupal\rules\Engine\ExpressionInterface;
-use Drupal\rules\Engine\IntegrityCheckTrait;
+use Drupal\rules\Context\ContextHandlerIntegrityTrait;
 use Drupal\rules\Engine\IntegrityViolationList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,13 +33,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RulesCondition extends ExpressionBase implements ConditionExpressionInterface, ContainerFactoryPluginInterface {
 
-  use ContextHandlerTrait;
-  use IntegrityCheckTrait;
+  use ContextHandlerIntegrityTrait;
 
   /**
    * The condition manager used to instantiate the condition plugin.
    *
-   * @var \Drupal\Core\Condition\ConditionManager
+   * @var \Drupal\rules\Core\ConditionManager
    */
   protected $conditionManager;
 
@@ -55,7 +53,7 @@ class RulesCondition extends ExpressionBase implements ConditionExpressionInterf
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Condition\ConditionManager $condition_manager
+   * @param \Drupal\rules\Core\ConditionManager $condition_manager
    *   The condition manager.
    * @param \Drupal\rules\Context\DataProcessorManager $processor_manager
    *   The data processor plugin manager.
@@ -112,21 +110,12 @@ class RulesCondition extends ExpressionBase implements ConditionExpressionInterf
       'negate' => $this->configuration['negate'],
     ]);
 
-    // We have to forward the context values from our configuration to the
-    // condition plugin.
-    $this->mapContext($condition, $state);
-
-    $condition->refineContextdefinitions();
-
-    // Send the context values through configured data processors before
-    // evaluating the condition.
-    $this->processData($condition, $state);
-
+    $this->prepareContext($condition, $state);
     $result = $condition->evaluate();
 
     // Now that the condition has been executed it can provide additional
     // context which we will have to pass back in the evaluation state.
-    $this->mapProvidedContext($condition, $state);
+    $this->addProvidedContext($condition, $state);
 
     if ($this->isNegated()) {
       $result = !$result;
@@ -138,22 +127,16 @@ class RulesCondition extends ExpressionBase implements ConditionExpressionInterf
   /**
    * {@inheritdoc}
    */
-  public function isNegated() {
-    return !empty($this->configuration['negate']);
+  public function negate($negate = TRUE) {
+    $this->configuration['negate'] = $negate;
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContextDefinitions() {
-    if (!isset($this->contextDefinitions)) {
-      // Pass up the context definitions from the condition plugin.
-      // @todo do not always create plugin instances here, the instance should
-      // be reused. Maybe that is what plugin bags are for?
-      $condition = $this->conditionManager->createInstance($this->configuration['condition_id']);
-      $this->contextDefinitions = $condition->getContextDefinitions();
-    }
-    return $this->contextDefinitions;
+  public function isNegated() {
+    return !empty($this->configuration['negate']);
   }
 
   /**
@@ -180,7 +163,7 @@ class RulesCondition extends ExpressionBase implements ConditionExpressionInterf
   /**
    * {@inheritdoc}
    */
-  public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state) {
+  public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state, $apply_assertions = TRUE) {
     $violation_list = new IntegrityViolationList();
     if (empty($this->configuration['condition_id'])) {
       $violation_list->addViolationWithMessage($this->t('Condition plugin ID is missing'), $this->getUuid());
@@ -196,20 +179,31 @@ class RulesCondition extends ExpressionBase implements ConditionExpressionInterf
     $condition = $this->conditionManager->createInstance($this->configuration['condition_id'], [
       'negate' => $this->configuration['negate'],
     ]);
-
-    return $this->doCheckIntegrity($condition, $metadata_state);
+    // Prepare and refine the context before checking integrity, such that any
+    // context definition changes are respected while checking.
+    $this->prepareContextWithMetadata($condition, $metadata_state);
+    $result = $this->checkContextConfigIntegrity($condition, $metadata_state);
+    $this->prepareExecutionMetadataState($metadata_state, NULL, $apply_assertions);
+    return $result;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL) {
-    $condition = $this->actionManager->createInstance($this->configuration['condition_id']);
-    $this->addProvidedVariablesToExecutionMetadataState($condition, $metadata_state);
-    if ($until) {
-      return FALSE;
+  public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL, $apply_assertions = TRUE) {
+    if ($until && $this->getUuid() === $until->getUuid()) {
+      return TRUE;
     }
-    return TRUE;
+    $condition = $this->conditionManager->createInstance($this->configuration['condition_id'], [
+      'negate' => $this->configuration['negate'],
+    ]);
+    // Make sure to refine context first, such that possibly refined definitions
+    // of provided context are respected.
+    $this->prepareContextWithMetadata($condition, $metadata_state);
+    $this->addProvidedContextDefinitions($condition, $metadata_state);
+    if ($apply_assertions && !$this->isNegated()) {
+      $this->assertMetadata($condition, $metadata_state);
+    }
   }
 
 }

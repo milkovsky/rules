@@ -7,6 +7,7 @@
 
 namespace Drupal\rules\Core;
 
+use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\Core\Session\AccountInterface;
@@ -31,8 +32,33 @@ abstract class RulesActionBase extends ContextAwarePluginBase implements RulesAc
   /**
    * {@inheritdoc}
    */
-  public function refineContextDefinitions() {
+  public function getContextValue($name) {
+    try {
+      return parent::getContextValue($name);
+    }
+    catch (ContextException $e) {
+      // Catch the undocumented exception thrown when no context value is set
+      // for a required context.
+      // @todo: Remove once https://www.drupal.org/node/2677162 is fixed.
+      if (strpos($e->getMessage(), 'context is required') === FALSE) {
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function refineContextDefinitions(array $selected_data) {
     // Do not refine anything by default.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function assertMetadata(array $selected_data) {
+    // Nothing to assert by default.
+    return [];
   }
 
   /**

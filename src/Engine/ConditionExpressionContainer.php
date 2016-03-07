@@ -10,17 +10,16 @@ namespace Drupal\rules\Engine;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\rules\Context\ContextConfig;
 use Drupal\rules\Exception\InvalidExpressionException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Container for conditions.
  */
-abstract class ConditionExpressionContainer extends ExpressionBase implements ConditionExpressionContainerInterface, ContainerFactoryPluginInterface {
+abstract class ConditionExpressionContainer extends ExpressionContainerBase implements ConditionExpressionContainerInterface, ContainerFactoryPluginInterface {
 
   /**
    * List of conditions that are evaluated.
    *
-   * @var \Drupal\rules\Core\RulesConditionInterface[]
+   * @var \Drupal\rules\Engine\ConditionExpressionInterface[]
    */
   protected $conditions = [];
 
@@ -50,18 +49,6 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('plugin.manager.rules_expression')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function addExpressionObject(ExpressionInterface $expression) {
     if (!$expression instanceof ConditionExpressionInterface) {
       throw new InvalidExpressionException('Only condition expressions can be added to a condition container.');
@@ -71,15 +58,6 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
     }
     $this->conditions[] = $expression;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addExpression($plugin_id, ContextConfig $config = NULL) {
-    return $this->addExpressionObject(
-      $this->expressionManager->createInstance($plugin_id, $config ? $config->toArray() : [])
-    );
   }
 
   /**
@@ -186,44 +164,6 @@ abstract class ConditionExpressionContainer extends ExpressionBase implements Co
       }
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state) {
-    $violation_list = new IntegrityViolationList();
-    foreach ($this->conditions as $condition) {
-      $condition_violations = $condition->checkIntegrity($metadata_state);
-      $violation_list->addAll($condition_violations);
-    }
-    return $violation_list;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL) {
-    if ($until) {
-      if ($this->getUuid() === $until->getUuid()) {
-        return TRUE;
-      }
-      foreach ($this->conditions as $condition) {
-        if ($condition->getUuid() === $until->getUuid()) {
-          return TRUE;
-        }
-        $found = $condition->prepareExecutionMetadataState($metadata_state, $until);
-        if ($found) {
-          return TRUE;
-        }
-      }
-      return FALSE;
-    }
-
-    foreach ($this->conditions as $condition) {
-      $condition->prepareExecutionMetadataState($metadata_state);
-    }
-    return TRUE;
   }
 
 }

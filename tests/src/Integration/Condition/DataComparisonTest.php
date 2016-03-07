@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\rules\Integration\Condition;
 
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Tests\rules\Integration\RulesIntegrationTestBase;
 
 /**
@@ -55,76 +56,76 @@ class DataComparisonTest extends RulesIntegrationTestBase {
     // is '==', TRUE is returned.
     $this->condition
       ->setContextValue('data', 'Llama')
-      ->setContextValue('operator', '==')
+      ->setContextValue('operation', '==')
       ->setContextValue('value', 'Llama');
     $this->assertTrue($this->condition->evaluate());
 
     // Test that when the data string does not equal the value string and the
-    // operator is '==', FALSE is returned.
+    // operation is '==', FALSE is returned.
     $this->condition
       ->setContextValue('data', 'Kitten')
-      ->setContextValue('operator', '==')
+      ->setContextValue('operation', '==')
       ->setContextValue('value', 'Llama');
     $this->assertFalse($this->condition->evaluate());
 
-    // Test that when both data and value are false booleans and the operator
+    // Test that when both data and value are false booleans and the operation
     // is '==', TRUE is returned.
     $this->condition
       ->setContextValue('data', FALSE)
-      ->setContextValue('operator', '==')
+      ->setContextValue('operation', '==')
       ->setContextValue('value', FALSE);
     $this->assertTrue($this->condition->evaluate());
 
     // Test that when a boolean data does not equal a boolean value
-    // and the operator is '==', FALSE is returned.
+    // and the operation is '==', FALSE is returned.
     $this->condition
       ->setContextValue('data', TRUE)
-      ->setContextValue('operator', '==')
+      ->setContextValue('operation', '==')
       ->setContextValue('value', FALSE);
     $this->assertFalse($this->condition->evaluate());
   }
 
   /**
-   * Tests evaluating the condition with the "contains" operator.
+   * Tests evaluating the condition with the "contains" operation.
    *
    * @covers ::evaluate
    */
   public function testConditionEvaluationOperatorContains() {
     // Test that when the data string contains the value string, and the
-    // operator is 'CONTAINS', TRUE is returned.
+    // operation is 'CONTAINS', TRUE is returned.
     $this->condition
       ->setContextValue('data', 'Big Llama')
-      ->setContextValue('operator', 'contains')
+      ->setContextValue('operation', 'contains')
       ->setContextValue('value', 'Llama');
     $this->assertTrue($this->condition->evaluate());
 
     // Test that when the data string does not contain the value string, and
-    // the operator is 'contains', TRUE is returned.
+    // the operation is 'contains', TRUE is returned.
     $this->condition
       ->setContextValue('data', 'Big Kitten')
-      ->setContextValue('operator', 'contains')
+      ->setContextValue('operation', 'contains')
       ->setContextValue('value', 'Big Kitten');
     $this->assertTrue($this->condition->evaluate());
 
-    // Test that when a data array contains the value string, and the operator
+    // Test that when a data array contains the value string, and the operation
     // is 'CONTAINS', TRUE is returned.
     $this->condition
       ->setContextValue('data', ['Llama', 'Kitten'])
-      ->setContextValue('operator', 'contains')
+      ->setContextValue('operation', 'contains')
       ->setContextValue('value', 'Llama');
     $this->assertTrue($this->condition->evaluate());
 
     // Test that when a data array does not contain the value array, and the
-    // operator is 'CONTAINS', TRUE is returned.
+    // operation is 'CONTAINS', TRUE is returned.
     $this->condition
       ->setContextValue('data', ['Kitten'])
-      ->setContextValue('operator', 'contains')
+      ->setContextValue('operation', 'contains')
       ->setContextValue('value', ['Llama']);
     $this->assertFalse($this->condition->evaluate());
   }
 
   /**
-   * Tests evaluating the condition with the "IN" operator.
+   * Tests evaluating the condition with the "IN" operation.
    *
    * @covers ::evaluate
    */
@@ -132,61 +133,61 @@ class DataComparisonTest extends RulesIntegrationTestBase {
     // Test that when the data string is 'IN' the value array, TRUE is returned.
     $this->condition
       ->setContextValue('data', 'Llama')
-      ->setContextValue('operator', 'IN')
+      ->setContextValue('operation', 'IN')
       ->setContextValue('value', ['Llama', 'Kitten']);
     $this->assertTrue($this->condition->evaluate());
 
-    // Test that when the data array is not in the value array, and the operator
-    // is 'IN', FALSE is returned.
+    // Test that when the data array is not in the value array, and the
+    // operation is 'IN', FALSE is returned.
     $this->condition
       ->setContextValue('data', ['Llama'])
-      ->setContextValue('operator', 'IN')
+      ->setContextValue('operation', 'IN')
       ->setContextValue('value', ['Kitten']);
     $this->assertFalse($this->condition->evaluate());
   }
 
   /**
-   * Tests evaluating the condition with the "is less than" operator.
+   * Tests evaluating the condition with the "is less than" operation.
    *
    * @covers ::evaluate
    */
   public function testConditionEvaluationOperatorLessThan() {
-    // Test that when data is less than value and operator is '<',
+    // Test that when data is less than value and operation is '<',
     // TRUE is returned.
     $this->condition
       ->setContextValue('data', 1)
-      ->setContextValue('operator', '<')
+      ->setContextValue('operation', '<')
       ->setContextValue('value', 2);
     $this->assertTrue($this->condition->evaluate());
 
-    // Test that when data is greater than value and operator is '<',
+    // Test that when data is greater than value and operation is '<',
     // FALSE is returned.
     $this->condition
       ->setContextValue('data', 2)
-      ->setContextValue('operator', '<')
+      ->setContextValue('operation', '<')
       ->setContextValue('value', 1);
     $this->assertFalse($this->condition->evaluate());
   }
 
   /**
-   * Tests evaluating the condition with the "is greater than" operator.
+   * Tests evaluating the condition with the "is greater than" operation.
    *
    * @covers ::evaluate
    */
   public function testConditionEvaluationOperatorGreaterThan() {
-    // Test that when data is greater than value and operator is '>',
+    // Test that when data is greater than value and operation is '>',
     // TRUE is returned.
     $this->condition
       ->setContextValue('data', 2)
-      ->setContextValue('operator', '>')
+      ->setContextValue('operation', '>')
       ->setContextValue('value', 1);
     $this->assertTrue($this->condition->evaluate());
 
-    // Test that when data is less than value and operator is '>',
+    // Test that when data is less than value and operation is '>',
     // FALSE is returned.
     $this->condition
       ->setContextValue('data', 1)
-      ->setContextValue('operator', '>')
+      ->setContextValue('operation', '>')
       ->setContextValue('value', 2);
     $this->assertFalse($this->condition->evaluate());
   }
@@ -198,6 +199,25 @@ class DataComparisonTest extends RulesIntegrationTestBase {
    */
   public function testSummary() {
     $this->assertEquals('Data comparison', $this->condition->summary());
+  }
+
+  /**
+   * @covers ::refineContextDefinitions
+   */
+  public function testRefineContextDefinitions() {
+    // When a string is selected for comparison, the value must be string also.
+    $this->condition->refineContextDefinitions([
+      'data' => DataDefinition::create('string'),
+    ]);
+    $this->assertEquals('string', $this->condition->getContextDefinition('value')->getDataType());
+
+    // IN operation requires a list of strings as value.
+    $this->condition->setContextValue('operation', 'IN');
+    $this->condition->refineContextDefinitions([
+      'data' => DataDefinition::create('string'),
+    ]);
+    $this->assertEquals('string', $this->condition->getContextDefinition('value')->getDataType());
+    $this->assertTrue($this->condition->getContextDefinition('value')->isMultiple());
   }
 
 }

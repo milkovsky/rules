@@ -2,25 +2,26 @@
 
 /**
  * @file
- * Contains \Drupal\rules\Engine\IntegrityCheckTrait.
+ * Contains \Drupal\rules\Engine\ContextHandlerIntegrityTrait.
  */
 
-namespace Drupal\rules\Engine;
+namespace Drupal\rules\Context;
 
-use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinitionInterface as CoreContextDefinitionInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface as CoreContextAwarePluginInterface;
-use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\ListInterface;
-use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\rules\Context\ContextDefinitionInterface as RulesContextDefinitionInterface;
-use Drupal\rules\Context\ContextProviderInterface;
+use Drupal\rules\Engine\ExecutionMetadataStateInterface;
+use Drupal\rules\Engine\IntegrityViolation;
+use Drupal\rules\Engine\IntegrityViolationList;
 use Drupal\rules\Exception\RulesIntegrityException;
 
 /**
- * Provides shared integrity checking methods for conditions and actions.
+ * Extends the context handler trait with support for checking integrity.
  */
-trait IntegrityCheckTrait {
+trait ContextHandlerIntegrityTrait {
+
+  use ContextHandlerTrait;
 
   /**
    * Performs the integrity check.
@@ -34,16 +35,19 @@ trait IntegrityCheckTrait {
    * @return \Drupal\rules\Engine\IntegrityViolationList
    *   The list of integrity violations.
    */
-  protected function doCheckIntegrity(CoreContextAwarePluginInterface $plugin, ExecutionMetadataStateInterface $metadata_state) {
+  protected function checkContextConfigIntegrity(CoreContextAwarePluginInterface $plugin, ExecutionMetadataStateInterface $metadata_state) {
     $violation_list = new IntegrityViolationList();
     $context_definitions = $plugin->getContextDefinitions();
+
+    // Make sure that all provided variables by this plugin are added to the
+    // execution metadata state.
+    $this->addProvidedContextDefinitions($plugin, $metadata_state);
 
     foreach ($context_definitions as $name => $context_definition) {
       // Check if a data selector is configured that maps to the state.
       if (isset($this->configuration['context_mapping'][$name])) {
         try {
-          $data_definition = $metadata_state->fetchDefinitionByPropertyPath($this->configuration['context_mapping'][$name]);
-
+          $data_definition = $this->getMappedDefinition($name, $metadata_state);
           $this->checkDataTypeCompatible($context_definition, $data_definition, $name, $violation_list);
         }
         catch (RulesIntegrityException $e) {
@@ -83,7 +87,7 @@ trait IntegrityCheckTrait {
           $violation_list->add($violation);
         }
       }
-      elseif ($context_definition->isRequired()) {
+      elseif ($context_definition->isRequired() && $context_definition->getDefaultValue() === NULL) {
         $violation = new IntegrityViolation();
         $violation->setMessage($this->t('The required context %context_name is missing.', [
           '%context_name' => $context_definition->getLabel(),
@@ -112,10 +116,6 @@ trait IntegrityCheckTrait {
       }
     }
 
-    // Make sure that all provided variables by this plugin are added to the
-    // execution metadata state.
-    $this->addProvidedVariablesToExecutionMetadataState($plugin, $metadata_state);
-
     return $violation_list;
   }
 
@@ -131,28 +131,17 @@ trait IntegrityCheckTrait {
    * @param \Drupal\rules\Engine\IntegrityViolationList $violation_list
    *   The list of violations where new ones will be added.
    */
-  protected function checkDataTypeCompatible(ContextDefinitionInterface $context_definition, DataDefinitionInterface $provided, $context_name, IntegrityViolationList $violation_list) {
-    $expected_class = $context_definition->getDataDefinition()->getClass();
-    $provided_class = $provided->getClass();
-    $expected_type_problem = NULL;
+  protected function checkDataTypeCompatible(CoreContextDefinitionInterface $context_definition, DataDefinitionInterface $provided, $context_name, IntegrityViolationList $violation_list) {
+    // Compare data types. For now, fail if they are not equal.
+    // @todo: Add support for matching based upon type-inheritance.
+    $target_type = $context_definition->getDataDefinition()->getDataType();
 
-    if (is_subclass_of($expected_class, PrimitiveInterface::class)
-      && !is_subclass_of($provided_class, PrimitiveInterface::class)
-    ) {
-      $expected_type_problem = $this->t('primitive');
+    // Special case any and entity target types for now.
+    if ($target_type == 'any' || ($target_type == 'entity' && strpos($provided->getDataType(), 'entity:') !== FALSE)) {
+      return;
     }
-    elseif (is_subclass_of($expected_class, ListInterface::class)
-      && !is_subclass_of($provided_class, ListInterface::class)
-    ) {
-      $expected_type_problem = $this->t('list');
-    }
-    elseif (is_subclass_of($expected_class, ComplexDataInterface::class)
-      && !is_subclass_of($provided_class, ComplexDataInterface::class)
-    ) {
-      $expected_type_problem = $this->t('complex');
-    }
-
-    if ($expected_type_problem) {
+    if ($target_type != $provided->getDataType()) {
+      $expected_type_problem = $context_definition->getDataDefinition()->getDataType();
       $violation = new IntegrityViolation();
       $violation->setMessage($this->t('Expected a @expected_type data type for context %context_name but got a @provided_type data type instead.', [
         '@expected_type' => $expected_type_problem,
@@ -162,35 +151,6 @@ trait IntegrityCheckTrait {
       $violation->setContextName($context_name);
       $violation->setUuid($this->getUuid());
       $violation_list->add($violation);
-    }
-  }
-
-  /**
-   * Adds provided variables to the execution metadata state.
-   *
-   * @param CoreContextAwarePluginInterface $plugin
-   *   The action or condition plugin that may provide variables.
-   * @param \Drupal\rules\Engine\ExecutionMetadataStateInterface $metadata_state
-   *   The excution metadata state to add variables to.
-   */
-  public function addProvidedVariablesToExecutionMetadataState(CoreContextAwarePluginInterface $plugin, ExecutionMetadataStateInterface $metadata_state) {
-    if ($plugin instanceof ContextProviderInterface) {
-      $provided_context_definitions = $plugin->getProvidedContextDefinitions();
-
-      foreach ($provided_context_definitions as $name => $context_definition) {
-        if (isset($this->configuration['provides_mapping'][$name])) {
-          // Populate the state with the new variable that is provided by this
-          // plugin. That is necessary so that the integrity check in subsequent
-          // actions knows about the variable and does not throw violations.
-          $metadata_state->setDataDefinition(
-            $this->configuration['provides_mapping'][$name],
-            $context_definition->getDataDefinition()
-          );
-        }
-        else {
-          $metadata_state->setDataDefinition($name, $context_definition->getDataDefinition());
-        }
-      }
     }
   }
 

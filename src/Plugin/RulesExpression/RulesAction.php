@@ -7,9 +7,7 @@
 
 namespace Drupal\rules\Plugin\RulesExpression;
 
-use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\rules\Context\ContextHandlerTrait;
 use Drupal\rules\Context\DataProcessorManager;
 use Drupal\rules\Core\RulesActionManagerInterface;
 use Drupal\rules\Engine\ActionExpressionInterface;
@@ -17,7 +15,7 @@ use Drupal\rules\Engine\ExecutionMetadataStateInterface;
 use Drupal\rules\Engine\ExecutionStateInterface;
 use Drupal\rules\Engine\ExpressionBase;
 use Drupal\rules\Engine\ExpressionInterface;
-use Drupal\rules\Engine\IntegrityCheckTrait;
+use Drupal\rules\Context\ContextHandlerIntegrityTrait;
 use Drupal\rules\Engine\IntegrityViolationList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -35,8 +33,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RulesAction extends ExpressionBase implements ContainerFactoryPluginInterface, ActionExpressionInterface {
 
-  use ContextHandlerTrait;
-  use IntegrityCheckTrait;
+  use ContextHandlerIntegrityTrait;
 
   /**
    * The action manager used to instantiate the action plugin.
@@ -97,16 +94,7 @@ class RulesAction extends ExpressionBase implements ContainerFactoryPluginInterf
   public function executeWithState(ExecutionStateInterface $state) {
     $action = $this->actionManager->createInstance($this->configuration['action_id']);
 
-    // We have to forward the context values from our configuration to the
-    // action plugin.
-    $this->mapContext($action, $state);
-
-    $action->refineContextdefinitions();
-
-    // Send the context value through configured data processor before executing
-    // the action.
-    $this->processData($action, $state);
-
+    $this->prepareContext($action, $state);
     $action->execute();
 
     $auto_saves = $action->autoSaveContext();
@@ -117,28 +105,7 @@ class RulesAction extends ExpressionBase implements ContainerFactoryPluginInterf
 
     // Now that the action has been executed it can provide additional
     // context which we will have to pass back in the evaluation state.
-    $this->mapProvidedContext($action, $state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContextDefinitions() {
-    // Pass up the context definitions from the action plugin.
-    $definition = $this->actionManager->getDefinition($this->configuration['action_id']);
-    return !empty($definition['context']) ? $definition['context'] : [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContextDefinition($name) {
-    // Pass up the context definitions from the action plugin.
-    $definition = $this->actionManager->getDefinition($this->configuration['action_id']);
-    if (empty($definition['context'][$name])) {
-      throw new ContextException(sprintf("The %s context is not a valid context.", $name));
-    }
-    return $definition['context'][$name];
+    $this->addProvidedContext($action, $state);
   }
 
   /**
@@ -165,7 +132,7 @@ class RulesAction extends ExpressionBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state) {
+  public function checkIntegrity(ExecutionMetadataStateInterface $metadata_state, $apply_assertions = TRUE) {
     $violation_list = new IntegrityViolationList();
     if (empty($this->configuration['action_id'])) {
       $violation_list->addViolationWithMessage($this->t('Action plugin ID is missing'), $this->getUuid());
@@ -180,19 +147,29 @@ class RulesAction extends ExpressionBase implements ContainerFactoryPluginInterf
 
     $action = $this->actionManager->createInstance($this->configuration['action_id']);
 
-    return $this->doCheckIntegrity($action, $metadata_state);
+    // Prepare and refine the context before checking integrity, such that any
+    // context definition changes are respected while checking.
+    $this->prepareContextWithMetadata($action, $metadata_state);
+    $result = $this->checkContextConfigIntegrity($action, $metadata_state);
+    $this->prepareExecutionMetadataState($metadata_state, NULL, $apply_assertions);
+    return $result;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL) {
-    $action = $this->actionManager->createInstance($this->configuration['action_id']);
-    $this->addProvidedVariablesToExecutionMetadataState($action, $metadata_state);
-    if ($until) {
-      return FALSE;
+  public function prepareExecutionMetadataState(ExecutionMetadataStateInterface $metadata_state, ExpressionInterface $until = NULL, $apply_assertions = TRUE) {
+    if ($until && $this->getUuid() === $until->getUuid()) {
+      return TRUE;
     }
-    return TRUE;
+    $action = $this->actionManager->createInstance($this->configuration['action_id']);
+    // Make sure to refine context first, such that possibly refined definitions
+    // of provided context are respected.
+    $this->prepareContextWithMetadata($action, $metadata_state);
+    $this->addProvidedContextDefinitions($action, $metadata_state);
+    if ($apply_assertions) {
+      $this->assertMetadata($action, $metadata_state);
+    }
   }
 
 }
