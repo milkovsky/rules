@@ -56,7 +56,7 @@ class EntitySaveTest extends RulesEntityIntegrationTestBase {
    * @covers ::summary
    */
   public function testSummary() {
-    $this->assertEquals('Save entity', $this->action->summary());
+    $this->assertEquals('Save test', $this->action->summary());
   }
 
   /**

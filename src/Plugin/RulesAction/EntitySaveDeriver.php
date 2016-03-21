@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see \Drupal\rules\Plugin\RulesAction\EntitySave
  */
 class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -30,13 +31,16 @@ class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
+
   protected $entityTypeManager;
+
   /**
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface;
    */
   protected $entityFieldManager;
+
   /**
    * Saves a new EntitySaveDeriver object.
    *
@@ -79,7 +83,7 @@ class EntitySaveDeriver extends DeriverBase implements ContainerDeriverInterface
         'context' => [
           'entity' => ContextDefinition::create("entity:$entity_type_id")
             ->setLabel($entity_type->getLabel())
-            ->setDescription($this->t('Specifies the entity, which should be saved permanently.'))
+            ->setDescription($this->t('Specifies the @entity_type_label that should be saved permanently.', ['@entity_type_label' => $entity_type->getLabel()]))
             ->setRequired(TRUE),
           'immediate' => ContextDefinition::create('boolean')
             ->setLabel($this->t('Force saving immediately'))
