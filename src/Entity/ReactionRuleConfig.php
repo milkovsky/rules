@@ -8,6 +8,7 @@
 namespace Drupal\rules\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\rules\Rules;
 use Drupal\rules\Ui\RulesUiComponentProviderInterface;
 use Drupal\rules\Engine\ExpressionInterface;
 use Drupal\rules\Engine\RulesComponent;
@@ -38,10 +39,9 @@ use Drupal\rules\Engine\RulesComponent;
  *     "id",
  *     "label",
  *     "events",
- *     "module",
  *     "description",
- *     "tag",
- *     "core",
+ *     "tags",
+ *     "config_version",
  *     "expression",
  *   },
  *   links = {
@@ -78,19 +78,16 @@ class ReactionRuleConfig extends ConfigEntityBase implements RulesUiComponentPro
   /**
    * The "tags" of a Reaction rule.
    *
-   * The tags are stored as a single string, though it is used as multiple tags
-   * for example in the rules overview.
-   *
-   * @var string
+   * @var string[]
    */
-  protected $tag = '';
+  protected $tags = [];
 
   /**
-   * The core version the Reaction rule was created for.
+   * The version the Reaction rule was created for.
    *
    * @var int
    */
-  protected $core = \Drupal::CORE_COMPATIBILITY;
+  protected $config_version = Rules::CONFIG_VERSION;
 
   /**
    * The expression plugin specific configuration as nested array.
@@ -107,13 +104,6 @@ class ReactionRuleConfig extends ConfigEntityBase implements RulesUiComponentPro
    * @var \Drupal\rules\Engine\ExpressionInterface
    */
   protected $expressionObject;
-
-  /**
-   * The module implementing this Reaction rule.
-   *
-   * @var string
-   */
-  protected $module = 'rules';
 
   /**
    * The events this reaction rule is reacting on.
@@ -220,10 +210,13 @@ class ReactionRuleConfig extends ConfigEntityBase implements RulesUiComponentPro
   }
 
   /**
-   * Returns the tag.
+   * Returns the tags associated with this config.
+   *
+   * @return string[]
+   *   The numerically indexed array of tag names.
    */
-  public function getTag() {
-    return $this->tag;
+  public function getTags() {
+    return $this->tags;
   }
 
   /**
@@ -258,13 +251,7 @@ class ReactionRuleConfig extends ConfigEntityBase implements RulesUiComponentPro
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
-
-    // Ensure that the Reaction rule is dependent on the module that
-    // implements the component.
-    $this->addDependency('module', $this->module);
-
-    // @todo Handle dependencies of plugins that are provided by various modules
-    //   here.
+    $this->addDependencies($this->getComponent()->calculateDependencies());
     return $this->dependencies;
   }
 

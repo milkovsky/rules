@@ -165,7 +165,8 @@ class RulesComponent {
    * Adds the available event context for the given events.
    *
    * @param string[] $event_names
-   *   The event names; e.g., as configured for a reaction rule.
+   *   The (fully qualified) event names; e.g., as configured for a reaction
+   *   rule.
    *
    * @return $this
    */
@@ -319,6 +320,29 @@ class RulesComponent {
     // Implement a deep clone.
     $this->state = clone $this->state;
     $this->expression = clone $this->expression;
+  }
+
+  /**
+   * Returns autocomplete results for the given partial selector.
+   *
+   * Example: "node.uid.e" will return ["node.uid.entity"].
+   *
+   * @param string $partial_selector
+   *   The partial data selector.
+   * @param \Drupal\rules\Engine\ExpressionInterface $until
+   *   The expression in which the autocompletion will be executed. All
+   *   variables in the exection metadata state up to that point are available.
+   *
+   * @return string[]
+   *   An array of autocomplete suggestions.
+   */
+  public function autocomplete($partial_selector, ExpressionInterface $until = NULL) {
+    // We use the integrity check to populate the execution metadata state with
+    // available variables.
+    $metadata_state = $this->getMetadataState();
+    $this->expression->prepareExecutionMetadataState($metadata_state, $until);
+
+    return $metadata_state->autocomplete($partial_selector);
   }
 
 }

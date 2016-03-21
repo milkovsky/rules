@@ -113,4 +113,13 @@ class ExecutionMetadataState implements ExecutionMetadataStateInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function autocomplete($partial_property_path) {
+    return $this
+        ->getDataFetcher()
+        ->autocompletePropertyPath($this->dataDefinitions, $partial_property_path);
+  }
+
 }
