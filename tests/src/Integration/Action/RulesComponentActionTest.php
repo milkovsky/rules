@@ -9,6 +9,7 @@ namespace Drupal\Tests\rules\Integration\Action;
 
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\rules\Context\ContextConfig;
 use Drupal\rules\Context\ContextDefinition;
 use Drupal\rules\Engine\RulesComponent;
@@ -21,6 +22,19 @@ use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
  * @group rules
  */
 class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+    // Prepare mocked entity storage.
+    $entity_type_storage = $this->prophesize(EntityStorageBase::class);
+
+    // Return the mocked storage controller.
+    $this->entityTypeManager->getStorage('test')
+      ->willReturn($entity_type_storage->reveal());
+  }
 
   /**
    * Tests that a rule can be used as action.
@@ -47,7 +61,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
   public function testExecute() {
     // Set up a rules component that will just save an entity.
     $nested_rule = $this->rulesExpressionManager->createRule();
-    $nested_rule->addAction('rules_entity_save', ContextConfig::create()
+    $nested_rule->addAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'entity')
     );
 
@@ -144,7 +158,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
     $entity = $this->prophesizeEntity(EntityInterface::class);
 
     $nested_rule = $this->rulesExpressionManager->createRule();
-    $nested_rule->addAction('rules_entity_save', ContextConfig::create()
+    $nested_rule->addAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'entity')
     );
 
@@ -163,7 +177,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
     $rule->addAction('rules_component:test_rule', ContextConfig::create()
       ->map('entity', 'entity')
     );
-    $rule->addAction('rules_entity_save', ContextConfig::create()
+    $rule->addAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'entity')
     );
 

@@ -8,6 +8,7 @@
 namespace Drupal\Tests\rules\Integration\Engine;
 
 use Drupal\rules\Context\ContextConfig;
+use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\rules\Context\ContextDefinition;
 use Drupal\rules\Engine\RulesComponent;
 use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
@@ -20,11 +21,24 @@ use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
 class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+    // Prepare mocked entity storage.
+    $entity_type_storage = $this->prophesize(EntityStorageBase::class);
+
+    // Return the mocked storage controller.
+    $this->entityTypeManager->getStorage('test')
+      ->willReturn($entity_type_storage->reveal());
+  }
+
+  /**
    * Tests that the integrity check can be invoked.
    */
   public function testIntegrityCheck() {
     $rule = $this->rulesExpressionManager->createRule();
-    $rule->addAction('rules_entity_save', ContextConfig::create()
+    $rule->addAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'entity')
     );
 
@@ -39,7 +53,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
    */
   public function testUnknownVariable() {
     $rule = $this->rulesExpressionManager->createRule();
-    $action = $this->rulesExpressionManager->createAction('rules_entity_save', ContextConfig::create()
+    $action = $this->rulesExpressionManager->createAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'unknown_variable')
       ->toArray()
     );
@@ -50,7 +64,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
     $this->assertEquals(1, iterator_count($violation_list));
     $violation = $violation_list[0];
     $this->assertEquals(
-      'Data selector <em class="placeholder">unknown_variable</em> for context <em class="placeholder">Entity</em> is invalid. Unable to get variable unknown_variable, it is not defined.',
+      'Data selector <em class="placeholder">unknown_variable</em> for context <em class="placeholder">Test</em> is invalid. Unable to get variable unknown_variable, it is not defined.',
       (string) $violation->getMessage()
     );
     $this->assertEquals($action->getUuid(), $violation->getUuid());
@@ -64,7 +78,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
     // Just use a rule with 2 dummy actions.
     $rule->addAction('rules_entity_save', ContextConfig::create()
           ->map('entity', 'unknown_variable_1'));
-    $second_action = $this->rulesExpressionManager->createAction('rules_entity_save', ContextConfig::create()
+    $second_action = $this->rulesExpressionManager->createAction('rules_entity_save:test', ContextConfig::create()
       ->map('entity', 'unknown_variable_2')
       ->toArray()
     );
@@ -80,7 +94,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
     $this->assertEquals(1, count($uuid_violations));
     $violation = $uuid_violations[0];
     $this->assertEquals(
-      'Data selector <em class="placeholder">unknown_variable_2</em> for context <em class="placeholder">Entity</em> is invalid. Unable to get variable unknown_variable_2, it is not defined.',
+      'Data selector <em class="placeholder">unknown_variable_2</em> for context <em class="placeholder">Test</em> is invalid. Unable to get variable unknown_variable_2, it is not defined.',
       (string) $violation->getMessage()
     );
     $this->assertEquals($second_action->getUuid(), $violation->getUuid());
