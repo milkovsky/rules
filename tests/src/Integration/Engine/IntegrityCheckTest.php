@@ -38,7 +38,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
     );
 
     $violation_list = RulesComponent::create($rule)
-      ->addContextDefinition('entity', ContextDefinition::create('entity'))
+      ->addContextDefinition('entity', ContextDefinition::create('entity:test'))
       ->checkIntegrity();
     $this->assertEquals(0, iterator_count($violation_list));
   }
@@ -80,7 +80,7 @@ class IntegrityCheckTest extends RulesEntityIntegrationTestBase {
     $rule->addExpressionObject($second_action);
 
     $all_violations = RulesComponent::create($rule)
-      ->addContextDefinition('entity', ContextDefinition::create('entity'))
+      ->addContextDefinition('entity', ContextDefinition::create('entity:test'))
       ->checkIntegrity();
 
     $this->assertEquals(2, iterator_count($all_violations));

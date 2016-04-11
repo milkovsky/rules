@@ -65,7 +65,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
       'label' => 'Test rule',
     ], 'rules_component');
     $rules_config->setExpression($nested_rule);
-    $rules_config->setContextDefinitions(['entity' => ContextDefinition::create('entity')]);
+    $rules_config->setContextDefinitions(['entity' => ContextDefinition::create('entity:test')]);
 
     $this->prophesizeStorage([$rules_config]);
 
@@ -80,7 +80,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
     $entity->save()->shouldBeCalledTimes(1);
 
     RulesComponent::create($rule)
-      ->addContextDefinition('entity', ContextDefinition::create('entity'))
+      ->addContextDefinition('entity', ContextDefinition::create('entity:test'))
       ->setContextValue('entity', $entity->reveal())
       ->execute();
   }
@@ -162,7 +162,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
       'label' => 'Test rule',
     ], 'rules_component');
     $rules_config->setExpression($nested_rule);
-    $rules_config->setContextDefinitions(['entity' => ContextDefinition::create('entity')]);
+    $rules_config->setContextDefinitions(['entity' => ContextDefinition::create('entity:test')]);
 
     $this->prophesizeStorage([$rules_config]);
 
@@ -180,7 +180,7 @@ class RulesComponentActionTest extends RulesEntityIntegrationTestBase {
     $entity->save()->shouldBeCalledTimes(1);
 
     RulesComponent::create($rule)
-      ->addContextDefinition('entity', ContextDefinition::create('entity'))
+      ->addContextDefinition('entity', ContextDefinition::create('entity:test'))
       ->setContextValue('entity', $entity->reveal())
       ->execute();
   }

@@ -43,7 +43,7 @@ class AutoSaveTest extends RulesEntityIntegrationTestBase {
     $entity->save()->shouldBeCalledTimes(1);
 
     RulesComponent::create($rule)
-      ->addContextDefinition('entity', ContextDefinition::create('entity'))
+      ->addContextDefinition('entity', ContextDefinition::create('entity:test'))
       ->setContextValue('entity', $entity->reveal())
       ->execute();
   }
