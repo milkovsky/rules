@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesEvent\EntityPresaveDeriver.
- */
-
 namespace Drupal\rules\Plugin\RulesEvent;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
@@ -66,6 +61,10 @@ class EntityPresaveDeriver extends DeriverBase implements ContainerDeriverInterf
           $entity_type_id => [
             'type' => "entity:$entity_type_id",
             'label' => $entity_type->getLabel(),
+          ],
+          $entity_type_id . '_unchanged' => [
+            'type' => "entity:$entity_type_id",
+            'label' => $this->t('Unchanged @entity_type', ['@entity_type' => $entity_type->getLabel()]),
           ],
         ],
       ] + $base_plugin_definition;

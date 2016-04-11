@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Rules controller.
- */
-
 namespace Drupal\rules\Controller;
 
 use Drupal\rules\Ui\RulesUiHandlerInterface;
@@ -44,11 +39,6 @@ class AutocompleteController {
 
     $string = $request->query->get('q');
     $results = $component->autocomplete($string, $nested_expression);
-
-    // @todo the API should return the formatted results.
-    $results = array_map(function ($value) {
-      return ['value' => $value, 'label' => $value];
-    }, $results);
 
     return new JsonResponse($results);
   }
