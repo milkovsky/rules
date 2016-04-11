@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesAction\EntitySaveDeriver.
- */
-
 namespace Drupal\rules\Plugin\RulesAction;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
