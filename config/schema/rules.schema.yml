@@ -10,18 +10,18 @@ rules.component.*:
     label:
       type: label
       label: 'Label'
-    module:
-      type: string
-      label: 'Module'
     description:
       type: text
       label: 'Administrative description'
-    tag:
+    tags:
+      type: sequence
+      label: Tags
+      sequence:
+        type: string
+        label: 'Tag'
+    config_version:
       type: string
-      label: 'Tag'
-    core:
-      type: string
-      label: 'Drupal version'
+      label: 'Configuration schema version'
     component:
       type: rules_component
 
@@ -50,18 +50,18 @@ rules.reaction.*:
             label: 'Configuration'
             sequence:
               type: mapping
-    module:
-      type: string
-      label: 'Module'
     description:
       type: text
       label: 'Administrative description'
-    tag:
+    tags:
+      type: sequence
+      label: Tags
+      sequence:
+        type: string
+        label: 'Tag'
+    config_version:
       type: string
-      label: 'Tag'
-    core:
-      type: string
-      label: 'Drupal version'
+      label: 'Configuration schema version'
     expression:
       type: rules_expression.[id]
       label: 'Expression configuration'
@@ -70,15 +70,15 @@ rules.settings:
   type: config_object
   label: 'Rules settings'
   mapping:
-    log_errors:
+    log:
+      type: boolean
+      label: 'Log debug information'
+    log_level_system:
       type: string
-      label: 'Logging of Rules evaluation errors'
-    debug_log:
+      label: 'Log level'
+    debug_screen:
       type: boolean
-      label: 'Log debug information to the available loggers'
-    debug:
-      type: boolean
-      label: 'Show debug information'
-    log_level:
+      label: 'Show debug information on screen (in the HTML response)'
+    log_level_screen:
       type: string
       label: 'Log level'

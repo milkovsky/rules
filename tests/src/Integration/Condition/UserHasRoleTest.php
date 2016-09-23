@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Integration\Condition\UserHasRoleTest.
- */
-
 namespace Drupal\Tests\rules\Integration\Condition;
 
 use Drupal\Tests\rules\Integration\RulesEntityIntegrationTestBase;
@@ -93,7 +88,7 @@ class UserHasRoleTest extends RulesEntityIntegrationTestBase {
    *
    * @covers ::execute
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\rules\Exception\InvalidArgumentException
    */
   public function testInvalidOperationException() {
     // Set-up a mock object with roles 'authenticated' and 'editor', but not

@@ -1,15 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\RulesComponent.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\rules\Context\ContextDefinition;
 use Drupal\rules\Context\ContextDefinitionInterface;
+use Drupal\rules\Exception\LogicException;
 
 /**
  * Handles executable Rules components.
@@ -165,7 +161,8 @@ class RulesComponent {
    * Adds the available event context for the given events.
    *
    * @param string[] $event_names
-   *   The event names; e.g., as configured for a reaction rule.
+   *   The (fully qualified) event names; e.g., as configured for a reaction
+   *   rule.
    *
    * @return $this
    */
@@ -212,14 +209,14 @@ class RulesComponent {
    * @param mixed $value
    *   The context value.
    *
-   * @throws \LogicException
-   *   Thrown if the passed context is not defined.
-   *
    * @return $this
+   *
+   * @throws \Drupal\rules\Exception\LogicException
+   *   Thrown if the passed context is not defined.
    */
   public function setContextValue($name, $value) {
     if (!isset($this->contextDefinitions[$name])) {
-      throw new \LogicException("The specified context '$name' is not defined.");
+      throw new LogicException("The specified context '$name' is not defined.");
     }
     $this->state->setVariable($name, $this->contextDefinitions[$name], $value);
     return $this;
@@ -231,7 +228,7 @@ class RulesComponent {
    * @return mixed[]
    *   The array of provided context values, keyed by context name.
    *
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
+   * @throws \Drupal\rules\Exception\EvaluationException
    *   Thrown if the Rules expression triggers errors during execution.
    */
   public function execute() {
@@ -254,9 +251,9 @@ class RulesComponent {
    * @return mixed[]
    *   The array of provided context values, keyed by context name.
    *
-   * @throws \LogicException
+   * @throws \Drupal\rules\Exception\LogicException
    *   Thrown if the context is not defined.
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
+   * @throws \Drupal\rules\Exception\EvaluationException
    *   Thrown if the Rules expression triggers errors during execution.
    */
   public function executeWithArguments(array $arguments) {
@@ -319,6 +316,33 @@ class RulesComponent {
     // Implement a deep clone.
     $this->state = clone $this->state;
     $this->expression = clone $this->expression;
+  }
+
+  /**
+   * Returns autocomplete results for the given partial selector.
+   *
+   * Example: "node.uid.e" will return ["node.uid.entity"].
+   *
+   * @param string $partial_selector
+   *   The partial data selector.
+   * @param \Drupal\rules\Engine\ExpressionInterface $until
+   *   The expression in which the autocompletion will be executed. All
+   *   variables in the exection metadata state up to that point are available.
+   *
+   * @return array[]
+   *   A list of autocomplete suggestions - valid property paths for one of the
+   *   provided data definitions. Each entry is an array with the following
+   *   keys:
+   *   - value: the data selecor property path.
+   *   - label: the human readable label suggestion.
+   */
+  public function autocomplete($partial_selector, ExpressionInterface $until = NULL) {
+    // We use the integrity check to populate the execution metadata state with
+    // available variables.
+    $metadata_state = $this->getMetadataState();
+    $this->expression->prepareExecutionMetadataState($metadata_state, $until);
+
+    return $metadata_state->autocomplete($partial_selector);
   }
 
 }

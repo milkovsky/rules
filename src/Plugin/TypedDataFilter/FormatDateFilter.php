@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rules\Plugin\TypedDataFilter\FormatDateFilter.
- */
-
 namespace Drupal\rules\Plugin\TypedDataFilter;
 
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -14,6 +9,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
+use Drupal\rules\Exception\InvalidArgumentException;
 use Drupal\rules\TypedData\DataFilterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -82,7 +78,7 @@ class FormatDateFilter extends DataFilterBase implements ContainerFactoryPluginI
     if ($arguments[0] != 'custom' && $bubbleable_metadata) {
       $config = $this->dateFormatStorage->load($arguments[0]);
       if (!$config) {
-        throw new \InvalidArgumentException("Unknown date format $arguments[0] given.");
+        throw new InvalidArgumentException("Unknown date format $arguments[0] given.");
       }
       $bubbleable_metadata->addCacheableDependency($config);
     }

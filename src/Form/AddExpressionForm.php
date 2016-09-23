@@ -1,17 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\AddExpressionForm.
- */
-
 namespace Drupal\rules\Form;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\rules\Core\RulesUiHandlerInterface;
+use Drupal\rules\Ui\RulesUiHandlerInterface;
 use Drupal\rules\Engine\ExpressionContainerInterface;
 use Drupal\rules\Engine\ExpressionManagerInterface;
 use Drupal\rules\Engine\RulesComponent;
+use Drupal\rules\Exception\LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -75,7 +71,7 @@ class AddExpressionForm extends EditExpressionForm {
   protected function getEditedExpression(RulesComponent $component) {
     $component_expression = $component->getExpression();
     if (!$component_expression instanceof ExpressionContainerInterface) {
-      throw new \LogicException('Cannot add expression to expression of type ' . $component_expression->getPluginId());
+      throw new LogicException('Cannot add expression to expression of type ' . $component_expression->getPluginId());
     }
     if ($this->uuid && $expression = $component_expression->getExpression($this->uuid)) {
       return $expression;

@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Context\ContextConfig.
- */
-
 namespace Drupal\rules\Context;
 
 use Drupal\Core\Plugin\ContextAwarePluginInterface as CoreContextAwarePluginInterface;
+use Drupal\rules\Exception\LogicException;
 
 /**
  * Class for value objects helping with context configuration.
@@ -60,7 +56,7 @@ class ContextConfig {
    * @param string $property_path
    *   A valid property path; e.g., "node.uid.target_id".
    *
-   * @throws \LogicException
+   * @throws \Drupal\rules\Exception\LogicException
    *   Thrown if a context value and map are set for a given context at the same
    *   time.
    *
@@ -68,7 +64,7 @@ class ContextConfig {
    */
   public function map($context_name, $property_path) {
     if (isset($this->config['context_values'][$context_name])) {
-      throw new \LogicException("Cannot map a context value and pre-define it at the same time.");
+      throw new LogicException("Cannot map a context value and pre-define it at the same time.");
     }
     $this->config['context_mapping'][$context_name] = $property_path;
     return $this;
@@ -84,7 +80,7 @@ class ContextConfig {
    *   context's data type, unless a data processor takes care of processing it
    *   to a valid value.
    *
-   * @throws \LogicException
+   * @throws \Drupal\rules\Exception\LogicException
    *   Thrown if a context value and map are set for a given context at the same
    *   time.
    *
@@ -92,7 +88,7 @@ class ContextConfig {
    */
   public function setValue($context_name, $value) {
     if (isset($this->config['context_mapping'][$context_name])) {
-      throw new \LogicException("Cannot map a context value and pre-define it at the same time.");
+      throw new LogicException("Cannot map a context value and pre-define it at the same time.");
     }
     $this->config['context_values'][$context_name] = $value;
     return $this;

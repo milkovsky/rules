@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Annotation\RulesDataProcessor.
- */
-
 namespace Drupal\rules\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -29,9 +24,9 @@ class RulesDataProcessor extends Plugin {
   /**
    * The human-readable name of the rules plugin.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 

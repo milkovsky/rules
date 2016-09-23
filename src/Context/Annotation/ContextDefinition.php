@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Context\Annotation\ContextDefinition.
- */
-
 namespace Drupal\rules\Context\Annotation;
 
 use Drupal\Core\Annotation\ContextDefinition as CoreContextDefinition;
@@ -46,7 +41,7 @@ class ContextDefinition extends CoreContextDefinition {
   /**
    * Returns the value of an annotation.
    *
-   * @return \Drupal\rules\Context\ContextDefinitionInterface.
+   * @return \Drupal\rules\Context\ContextDefinitionInterface
    *   Return the Rules version of the ContextDefinitionInterface.
    */
   public function get() {

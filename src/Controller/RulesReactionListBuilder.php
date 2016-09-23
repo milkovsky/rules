@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Controller\RulesReactionListBuilder.
- */
-
 namespace Drupal\rules\Controller;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -29,7 +24,7 @@ class RulesReactionListBuilder extends ConfigEntityListBuilder {
     $header['id'] = $this->t('ID');
     $header['label'] = $this->t('Label');
     $header['description'] = $this->t('Description');
-    $header['tag'] = $this->t('Tag');
+    $header['tags'] = $this->t('Tags');
     return $header + parent::buildHeader();
   }
 
@@ -41,7 +36,7 @@ class RulesReactionListBuilder extends ConfigEntityListBuilder {
     $row['id'] = $entity->id();
     $row['label'] = $this->getLabel($entity);
     $row['description'] = $entity->getDescription();
-    $row['tag'] = $entity->getTag();
+    $row['tags'] = implode(', ', $entity->getTags());
     return $row + parent::buildRow($entity);
   }
 

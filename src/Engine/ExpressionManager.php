@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\ExpressionManager.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Component\Uuid\UuidInterface;
@@ -53,6 +48,13 @@ class ExpressionManager extends DefaultPluginManager implements ExpressionManage
    */
   public function createRule(array $configuration = []) {
     return $this->createInstance('rules_rule', $configuration);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createActionSet(array $configuration = []) {
+    return $this->createInstance('rules_action_set', $configuration);
   }
 
   /**

@@ -1,20 +1,20 @@
 language: php
-sudo: false
+# The Travis CI container mode has random functional test fails, so we must use
+# sudo here.
+sudo: true
 
 php:
   - 5.5
-  # We need to specify the latest version here because otherwise there are
-  # segmentation faults in PHP 5.6.5.
-  - 5.6.18
+  - 5.6
   - 7
   # HHVM is disabled for now because we have not figured out yet how to start a
   # web server for the browser tests.
   #- hhvm
 
 env:
-  - DRUPAL_CORE=8.0.x
   - DRUPAL_CORE=8.1.x
   - DRUPAL_CORE=8.2.x
+  - DRUPAL_CORE=8.3.x
 
 matrix:
   allow_failures:
@@ -54,15 +54,16 @@ before_script:
   # Download Drupal 8 core from the Github mirror because it is faster.
   - travis_retry git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git
   - cd drupal
+  # Temporary core hack to get debug information when random test fails occur.
+  # See https://www.drupal.org/node/2659954
+  - wget -q -O - https://www.drupal.org/files/issues/core-debug_0.txt | patch -p1
 
   # Reference rules in build site.
   - ln -s $TESTDIR modules/rules
 
-  # Run composer install for Drupal 8.1. We need an up-to-date composer when
-  # installing Drupal 8.1.
-  # Disabled for now because core still includes the vendor directory, see
-  # https://www.drupal.org/node/1475510
-  # - if [ "$DRUPAL_CORE" = "8.1.x" ]; then composer self-update && composer install; fi
+  # Run composer install for Drupal 8.1 and up. We need an up-to-date composer
+  # when installing Drupal 8.1.
+  - travis_retry composer self-update && travis_retry composer install
 
   # Start a web server on port 8888, run in the background.
   - php -S localhost:8888 &

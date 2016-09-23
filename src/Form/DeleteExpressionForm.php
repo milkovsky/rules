@@ -1,15 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\DeleteExpressionForm.
- */
-
 namespace Drupal\rules\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\rules\Core\RulesUiHandlerInterface;
+use Drupal\rules\Ui\RulesUiHandlerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -27,7 +22,7 @@ class DeleteExpressionForm extends ConfirmFormBase {
   /**
    * The RulesUI handler of the currently active UI.
    *
-   * @var \Drupal\rules\Core\RulesUiHandlerInterface
+   * @var \Drupal\rules\Ui\RulesUiHandlerInterface
    */
   protected $rulesUiHandler;
 

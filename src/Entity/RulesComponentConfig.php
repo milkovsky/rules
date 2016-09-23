@@ -1,15 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rules\Entity\RulesComponentConfig.
- */
-
 namespace Drupal\rules\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\rules\Context\ContextDefinition;
-use Drupal\rules\Core\RulesUiComponentProviderInterface;
+use Drupal\rules\Rules;
+use Drupal\rules\Ui\RulesUiComponentProviderInterface;
 use Drupal\rules\Engine\ExpressionInterface;
 use Drupal\rules\Engine\RulesComponent;
 
@@ -37,10 +33,9 @@ use Drupal\rules\Engine\RulesComponent;
  *   config_export = {
  *     "id",
  *     "label",
- *     "module",
  *     "description",
- *     "tag",
- *     "core",
+ *     "tags",
+ *     "config_version",
  *     "component",
  *   },
  *   links = {
@@ -76,19 +71,16 @@ class RulesComponentConfig extends ConfigEntityBase implements RulesUiComponentP
   /**
    * The "tags" of a Rules component.
    *
-   * The tags are stored as a single string, though it is used as multiple tags
-   * for example in the rules overview.
-   *
-   * @var string
+   * @var string[]
    */
-  protected $tag = '';
+  protected $tags = [];
 
   /**
-   * The core version the Rules component was created for.
+   * The config version the Rules component was created for.
    *
    * @var int
    */
-  protected $core = \Drupal::CORE_COMPATIBILITY;
+  protected $config_version = Rules::CONFIG_VERSION;
 
   /**
    * The component configuration as nested array.
@@ -105,13 +97,6 @@ class RulesComponentConfig extends ConfigEntityBase implements RulesUiComponentP
    * @var \Drupal\rules\Engine\RulesComponent
    */
   protected $componentObject;
-
-  /**
-   * The module implementing this Rules component.
-   *
-   * @var string
-   */
-  protected $module = 'rules';
 
   /**
    * Gets a Rules expression instance for this Rules component.
@@ -249,10 +234,13 @@ class RulesComponentConfig extends ConfigEntityBase implements RulesUiComponentP
   }
 
   /**
-   * Returns the tag.
+   * Returns the tags associated with this config.
+   *
+   * @return string[]
+   *   The numerically indexed array of tag names.
    */
-  public function getTag() {
-    return $this->tag;
+  public function getTags() {
+    return $this->tags;
   }
 
   /**

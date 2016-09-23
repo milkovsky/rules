@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\RulesEventManager.
- */
-
 namespace Drupal\rules\Core;
 
 use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
@@ -44,6 +39,26 @@ class RulesEventManager extends DefaultPluginManager implements CategorizingPlug
     $this->discovery = new ContainerDerivativeDiscoveryDecorator(new YamlDiscovery('rules.events', $module_handler->getModuleDirectories()));
     $this->factory = new ContainerFactory($this, RulesEventHandlerInterface::class);
     $this->moduleHandler = $module_handler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstance($plugin_id, array $configuration = []) {
+    // If a fully qualified event name is passed, be sure to get the base name
+    // first.
+    $plugin_id = $this->getEventBaseName($plugin_id);
+    return parent::createInstance($plugin_id, $configuration);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition($plugin_id, $exception_on_invalid = TRUE) {
+    // If a fully qualified event name is passed, be sure to get the base name
+    // first.
+    $plugin_id = $this->getEventBaseName($plugin_id);
+    return parent::getDefinition($plugin_id, $exception_on_invalid);
   }
 
   /**

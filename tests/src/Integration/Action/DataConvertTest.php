@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Integration\Action\DataConvertTest.
- */
-
 namespace Drupal\Tests\rules\Integration\Action;
 
 use Drupal\Tests\rules\Integration\RulesIntegrationTestBase;
@@ -97,7 +92,7 @@ class DataConvertTest extends RulesIntegrationTestBase {
    *
    * @covers ::execute
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\rules\Exception\InvalidArgumentException
    */
   public function testInvalidValueException() {
     $this->executeAction(['some-array'], 'integer');
@@ -108,7 +103,7 @@ class DataConvertTest extends RulesIntegrationTestBase {
    *
    * @covers ::execute
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\rules\Exception\InvalidArgumentException
    */
   public function testInvalidRoundingBehavior() {
     $converted = $this->executeAction('some', 'decimal', 'down');
@@ -120,7 +115,7 @@ class DataConvertTest extends RulesIntegrationTestBase {
    *
    * @covers ::execute
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\rules\Exception\InvalidArgumentException
    */
   public function testInvalidRoundingBehaviorException() {
     $value = 5.5;
@@ -133,7 +128,7 @@ class DataConvertTest extends RulesIntegrationTestBase {
    *
    * @covers ::execute
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\rules\Exception\InvalidArgumentException
    */
   public function testInvalidTargetTypeException() {
     $value = 5.5;

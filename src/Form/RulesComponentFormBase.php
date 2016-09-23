@@ -1,19 +1,40 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\RulesComponentFormBase.
- */
-
 namespace Drupal\rules\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\rules\Engine\ExpressionManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the base form for rules add and edit forms.
  */
 abstract class RulesComponentFormBase extends EntityForm {
+
+  /**
+   * The Rules expression manager to get expression plugins.
+   *
+   * @var \Drupal\rules\Engine\ExpressionManagerInterface
+   */
+  protected $expressionManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static($container->get('plugin.manager.rules_expression'));
+  }
+
+  /**
+   * Creates a new object of this class.
+   *
+   * @param \Drupal\rules\Engine\ExpressionManagerInterface $expression_manager
+   *   The expression manager.
+   */
+  public function __construct(ExpressionManagerInterface $expression_manager) {
+    $this->expressionManager = $expression_manager;
+  }
 
   /**
    * {@inheritdoc}
@@ -50,11 +71,11 @@ abstract class RulesComponentFormBase extends EntityForm {
     ];
 
     // @todo enter a real tag field here.
-    $form['settings']['tag'] = [
+    $form['settings']['tags'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Tag'),
-      '#default_value' => $this->entity->getTag(),
-      '#description' => $this->t('Enter a tag here'),
+      '#title' => $this->t('Tags'),
+      '#default_value' => implode(', ', $this->entity->getTags()),
+      '#description' => $this->t('Enter a list of comma-separated tags here; e.g., "notification, publishing".'),
       '#required' => FALSE,
     ];
 
@@ -66,6 +87,16 @@ abstract class RulesComponentFormBase extends EntityForm {
     ];
 
     return parent::form($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildEntity(array $form, FormStateInterface $form_state) {
+    $entity = parent::buildEntity($form, $form_state);
+    $tags = array_map('trim', explode(',', $entity->get('tags')));
+    $entity->set('tags', $tags);
+    return $entity;
   }
 
   /**

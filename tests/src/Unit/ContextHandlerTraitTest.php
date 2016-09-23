@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Unit\ContextHandlerTraitTest.
- */
-
 namespace Drupal\Tests\rules\Unit;
 
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
@@ -24,7 +19,7 @@ class ContextHandlerTraitTest extends RulesUnitTestBase {
    *
    * @covers ::prepareContext
    *
-   * @expectedException \Drupal\rules\Exception\RulesEvaluationException
+   * @expectedException \Drupal\rules\Exception\EvaluationException
    *
    * @expectedExceptionMessage Required context test is missing for plugin testplugin.
    */

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExpressionManagerInterface.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -32,6 +27,17 @@ interface ExpressionManagerInterface extends PluginManagerInterface {
    *   The created rule.
    */
   public function createRule(array $configuration = []);
+
+  /**
+   * Creates a new action set.
+   *
+   * @param array $configuration
+   *   The configuration array to create the plugin instance with.
+   *
+   * @return \Drupal\rules\Plugin\RulesExpression\ActionSet
+   *   The created action set.
+   */
+  public function createActionSet(array $configuration = []);
 
   /**
    * Creates a new action expression.

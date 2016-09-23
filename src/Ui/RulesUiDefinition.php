@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\RulesUiDefinition.
- */
-
-namespace Drupal\rules\Core;
+namespace Drupal\rules\Ui;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
+use Drupal\rules\Exception\LogicException;
 
 /**
  * Class for rules_ui plugin definitions.
@@ -15,7 +11,7 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
  * Note that the class is treated as value object. Thus, there is no special
  * interface for it.
  *
- * @see \Drupal\rules\Core\RulesUiManagerInterface
+ * @see \Drupal\rules\Ui\RulesUiManagerInterface
  */
 class RulesUiDefinition implements PluginDefinitionInterface {
 
@@ -41,16 +37,16 @@ class RulesUiDefinition implements PluginDefinitionInterface {
   /**
    * The human-readable name of the plugin.
    *
-   * @ingroup plugin_translatable
-   *
    * @var string
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
   /**
    * The rules UI handler class.
    *
-   * The class must implement \Drupal\rules\Core\RulesUiHandlerInterface.
+   * The class must implement \Drupal\rules\Ui\RulesUiHandlerInterface.
    *
    * @var string
    */
@@ -97,18 +93,18 @@ class RulesUiDefinition implements PluginDefinitionInterface {
    * the RulesUiConfigHandler assumes a config entity and uses its label()
    * method.
    *
-   * @ingroup plugin_translatable
-   *
    * @var string|null
+   *
+   * @ingroup plugin_translatable
    */
   public $component_label;
 
   /**
    * The label used for referring to the component type.
    *
-   * @ingroup plugin_translatable
-   *
    * @var string|null
+   *
+   * @ingroup plugin_translatable
    */
   public $component_type_label = 'component';
 
@@ -130,20 +126,20 @@ class RulesUiDefinition implements PluginDefinitionInterface {
   /**
    * Validates the set property values.
    *
-   * @throws \LogicException
+   * @throws \Drupal\rules\Exception\LogicException
    *   Thrown if the set object properties are not valid.
    */
   public function validate() {
     if (!isset($this->id)) {
-      throw new \LogicException("Missing the required property 'id'.");
+      throw new LogicException("Missing the required property 'id'.");
     }
     foreach (['label', 'class', 'provider', 'base_route'] as $required) {
       if (!isset($this->$required)) {
-        throw new \LogicException("Plugin {$this->id} misses the required property $required.");
+        throw new LogicException("Plugin {$this->id} misses the required property $required.");
       }
     }
     if (!is_subclass_of($this->class, RulesUiHandlerInterface::class)) {
-      throw new \LogicException("The provided class does not implement the RulesUiHandlerInterface.");
+      throw new LogicException("The provided class does not implement the RulesUiHandlerInterface.");
     }
   }
 

@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Kernel\ContextIntegrationTest.
- */
-
 namespace Drupal\Tests\rules\Kernel;
 
 use Drupal\rules\Context\ContextConfig;
 use Drupal\rules\Context\ContextDefinition;
 use Drupal\rules\Engine\RulesComponent;
-use Drupal\rules\Exception\RulesEvaluationException;
+use Drupal\rules\Exception\EvaluationException;
 
 /**
  * Tests the the extended core context API with Rules.
@@ -42,7 +37,7 @@ class ContextIntegrationTest extends RulesDrupalTestBase {
       $component->execute();
       $this->fail('No exception thrown when required context value is NULL');
     }
-    catch (RulesEvaluationException $e) {
+    catch (EvaluationException $e) {
       $this->pass('Exception thrown as expected when a required context is NULL');
     }
   }
@@ -66,7 +61,7 @@ class ContextIntegrationTest extends RulesDrupalTestBase {
       $rule->execute();
       $this->fail('No exception thrown when required context value is NULL');
     }
-    catch (RulesEvaluationException $e) {
+    catch (EvaluationException $e) {
       $this->pass('Exception thrown as expected when a required context is NULL');
     }
   }

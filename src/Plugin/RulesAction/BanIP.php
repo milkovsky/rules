@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesAction\BanIP.
- */
-
 namespace Drupal\rules\Plugin\RulesAction;
 
 use Drupal\ban\BanIpManagerInterface;
@@ -41,7 +36,7 @@ class BanIP extends RulesActionBase implements ContainerFactoryPluginInterface {
   /**
    * The ban manager used to ban the IP.
    *
-   * @var \Drupal\ban\BanIpManagerInterface $banManger
+   * @var \Drupal\ban\BanIpManagerInterface
    */
   protected $banManager;
 

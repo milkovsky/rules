@@ -1,15 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\Expression\ConditionContainerForm.
- */
-
 namespace Drupal\rules\Form\Expression;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\rules\Core\RulesUiHandlerTrait;
+use Drupal\rules\Ui\RulesUiHandlerTrait;
 use Drupal\rules\Engine\ConditionExpressionContainerInterface;
 
 /**
@@ -78,6 +73,7 @@ class ConditionContainerForm implements ExpressionFormInterface {
     // @todo Put this into the table as last row and style it like it was in
     // Drupal 7 Rules.
     $form['add_condition'] = [
+      '#attributes' => ['class' => ['action-links']],
       '#theme' => 'menu_local_action',
       '#link' => [
         'title' => $this->t('Add condition'),

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Rules.
- */
-
 namespace Drupal\rules;
 
 /**
@@ -16,6 +11,11 @@ namespace Drupal\rules;
  * @see \Drupal
  */
 class Rules {
+
+  /**
+   * The current configuration schema version.
+   */
+  const CONFIG_VERSION = 3.0;
 
   /**
    * Returns the Rules expression manager service.

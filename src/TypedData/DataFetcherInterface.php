@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\rules\TypedData\DataFetcherInterface.
- */
-
 namespace Drupal\rules\TypedData;
 
 use Drupal\Core\Render\BubbleableMetadata;
@@ -35,7 +30,7 @@ interface DataFetcherInterface {
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    *   Thrown if the data cannot be fetched due to missing data; e.g., unset
    *   properties or list items.
-   * @throws \InvalidArgumentException
+   * @throws \Drupal\rules\Exception\InvalidArgumentException
    *   Thrown if the given path is not valid for the given data; e.g., a not
    *   existing property is referenced.
    */
@@ -58,7 +53,7 @@ interface DataFetcherInterface {
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    *   Thrown if the data cannot be fetched due to missing data; e.g., unset
    *   properties or list items.
-   * @throws \InvalidArgumentException
+   * @throws \Drupal\rules\Exception\InvalidArgumentException
    *   Thrown if the given path is not valid for the given data; e.g., a not
    *   existing property is referenced.
    */
@@ -78,7 +73,7 @@ interface DataFetcherInterface {
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
    *   The data definition of the target.
    *
-   * @throws \InvalidArgumentException
+   * @throws \Drupal\rules\Exception\InvalidArgumentException
    *   Thrown if the given path is not valid for the given data; e.g., a not
    *   existing property is referenced.
    */
@@ -98,10 +93,28 @@ interface DataFetcherInterface {
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
    *   The data definition of the target.
    *
-   * @throws \InvalidArgumentException
+   * @throws \Drupal\rules\Exception\InvalidArgumentException
    *   Thrown if the given path is not valid for the given data; e.g., a not
    *   existing property is referenced.
    */
   public function fetchDefinitionBySubPaths(DataDefinitionInterface $data_definition, array $sub_paths, $langcode = NULL);
+
+  /**
+   * Provides autocomplete suggestions for an incomplete property path.
+   *
+   * @param \Drupal\Core\TypedData\DataDefinitionInterface[] $data_definitions
+   *   A map of available data definitions that should be seareched. The array
+   *   keys are the first part of the property path.
+   * @param string $partial_property_path
+   *   The partial property path, example: "node.uid.ent".
+   *
+   * @return array[]
+   *   A list of autocomplete suggestions - valid property paths for one of the
+   *   provided data definitions. Each entry is an array with the following
+   *   keys:
+   *   - value: the data selecor property path.
+   *   - label: the human readable label suggestion.
+   */
+  public function autocompletePropertyPath(array $data_definitions, $partial_property_path);
 
 }

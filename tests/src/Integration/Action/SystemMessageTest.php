@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Integration\Action\SystemMessageTest.
- */
-
 namespace Drupal\Tests\rules\Integration\Action {
 
   use Drupal\Tests\rules\Integration\RulesIntegrationTestBase;
@@ -135,6 +130,7 @@ namespace Drupal\Tests\rules\Integration\Action {
 }
 
 namespace {
+
   if (!function_exists('drupal_set_message')) {
 
     /**
@@ -152,5 +148,6 @@ namespace {
 
       return $messages;
     }
+
   }
 }

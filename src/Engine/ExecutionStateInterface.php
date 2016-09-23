@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\ExecutionStateInterface.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -50,8 +45,8 @@ interface ExecutionStateInterface {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The variable wrapped as typed data.
    *
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
-   *   Throws a RulesEvaluationException if the variable does not exist in the
+   * @throws \Drupal\rules\Exception\EvaluationException
+   *   Throws an EvaluationException if the variable does not exist in the
    *   state.
    */
   public function getVariable($name);
@@ -65,8 +60,8 @@ interface ExecutionStateInterface {
    * @return mixed
    *   The variable value.
    *
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
-   *   Throws a RulesEvaluationException if the variable does not exist in the
+   * @throws \Drupal\rules\Exception\EvaluationException
+   *   Throws an EvaluationException if the variable does not exist in the
    *   state.
    */
   public function getVariableValue($name);
@@ -105,8 +100,8 @@ interface ExecutionStateInterface {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The variable wrapped as typed data.
    *
-   * @throws \Drupal\rules\Exception\RulesEvaluationException
-   *   Throws a RulesEvaluationException in case the selector cannot be applied.
+   * @throws \Drupal\rules\Exception\EvaluationException
+   *   Throws an EvaluationException in case the selector cannot be applied.
    */
   public function fetchDataByPropertyPath($property_path, $langcode = NULL);
 

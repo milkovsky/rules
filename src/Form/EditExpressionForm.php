@@ -1,15 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Form\EditExpressionForm.
- */
-
 namespace Drupal\rules\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\rules\Core\RulesUiHandlerInterface;
+use Drupal\rules\Ui\RulesUiHandlerInterface;
 use Drupal\rules\Engine\RulesComponent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -28,7 +23,7 @@ class EditExpressionForm extends FormBase {
   /**
    * The RulesUI handler of the currently active UI.
    *
-   * @var \Drupal\rules\Core\RulesUiHandlerInterface
+   * @var \Drupal\rules\Ui\RulesUiHandlerInterface
    */
   protected $rulesUiHandler;
 

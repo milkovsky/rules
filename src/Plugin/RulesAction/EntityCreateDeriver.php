@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Plugin\RulesAction\EntityCreateDeriver.
- */
-
 namespace Drupal\rules\Plugin\RulesAction;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
@@ -35,9 +30,10 @@ class EntityCreateDeriver extends DeriverBase implements ContainerDeriverInterfa
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface;
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
+
   /**
    * Creates a new EntityCreateDeriver object.
    *

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\rules\Unit\RulesConditionTest.
- */
-
 namespace Drupal\Tests\rules\Unit;
 
 use Drupal\rules\Core\ConditionManager;
@@ -17,7 +12,6 @@ use Drupal\rules\Plugin\RulesExpression\RulesCondition;
 use Drupal\rules\Core\RulesConditionInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
-
 
 /**
  * @coversDefaultClass \Drupal\rules\Plugin\RulesExpression\RulesCondition
@@ -84,10 +78,10 @@ class RulesConditionTest extends UnitTestCase {
     $condition = new RulesCondition([
       'condition_id' => 'test_condition',
     ] + ContextConfig::create()
-        // We don't care about the data processor plugin name and
-        // configuration since we will use a mock anyway.
-        ->process('test', 'foo', [])
-        ->toArray(),
+      // We don't care about the data processor plugin name and
+      // configuration since we will use a mock anyway.
+      ->process('test', 'foo', [])
+      ->toArray(),
     '', [], $this->conditionManager->reveal(), $this->processorManager->reveal());
 
     $this->trueCondition->getContextDefinitions()->willReturn([

@@ -1,11 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\RulesUiComponentProviderInterface.
- */
-
-namespace Drupal\rules\Core;
+namespace Drupal\rules\Ui;
 
 use Drupal\rules\Engine\RulesComponent;
 

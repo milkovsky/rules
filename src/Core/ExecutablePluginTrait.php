@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Core\ExecutablePluginTrait.
- */
-
 namespace Drupal\rules\Core;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -17,11 +12,11 @@ trait ExecutablePluginTrait {
   /**
    * Get the translated label from the plugin definition.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *   Thrown if the label is not defined for the plugin.
-   *
    * @return string
    *   The label of the plugin.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the label is not defined for the plugin.
    */
   protected function getLabelValue() {
     $definition = $this->getPluginDefinition();
@@ -37,11 +32,11 @@ trait ExecutablePluginTrait {
   /**
    * Get the translated summary from the label annotation.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *   Thrown if a summary was not set.
-   *
    * @return string
    *   The summary of the plugin.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if a summary was not set.
    */
   public function summary() {
     return $this->getLabelValue();

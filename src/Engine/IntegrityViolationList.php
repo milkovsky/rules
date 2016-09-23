@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\rules\Engine\IntegrityViolationList.
- */
-
 namespace Drupal\rules\Engine;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\rules\Exception\OutOfBoundsException;
 
 /**
  * Collection of integrity violations.
@@ -39,11 +35,16 @@ class IntegrityViolationList extends \ArrayIterator {
    * @return \Drupal\rules\Engine\IntegrityViolationInterface
    *   The violation.
    *
-   * @throws \OutOfBoundsException
+   * @throws \Drupal\rules\Exception\OutOfBoundsException
    *   Thrown if the offset does not exist.
    */
   public function get($offset) {
-    return $this->offsetGet($offset);
+    try {
+      return $this->offsetGet($offset);
+    }
+    catch (\OutOfBoundsException $e) {
+      throw new OutOfBoundsException();
+    }
   }
 
   /**

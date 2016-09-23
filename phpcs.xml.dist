@@ -9,12 +9,17 @@
     <!-- Annotations must use the same property names as in the configuration. -->
     <exclude-pattern>src/Annotation</exclude-pattern>
     <exclude-pattern>src/Core/Annotation</exclude-pattern>
-    <exclude-pattern>src/Core/RulesUiDefinition.php</exclude-pattern>
+    <exclude-pattern>src/Ui/RulesUiDefinition.php</exclude-pattern>
   </rule>
 
   <!--Blacklist of coding standard rules that are not yet fixed. -->
   <rule ref="Drupal">
     <exclude name="Drupal.Commenting.DocComment.MissingShort"/>
+  </rule>
+
+  <rule ref="DrupalPractice">
+    <!-- Allow empty lines after comments, we don't care. -->
+    <exclude name="DrupalPractice.Commenting.CommentEmptyLine"/>
   </rule>
 
   <!-- We always want short array syntax only. -->
